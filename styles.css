@@ -1,0 +1,977 @@
+:root {
+    --button-size: 60px; /* Control button size */
+	    --image-width: 50%; /* Width of the image space during the test */
+    --test-width: 50%; /* Width of the test space during the test */
+}
+
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+
+
+/* Container for the main content */
+.content-container {
+    padding: 10px; /* Add space around the edges */
+    max-width: 1200px; /* Limit the width of the content */
+    margin: 0 auto; /* Center the content on larger screens */
+}
+
+/* Optional - If you want to apply padding to the body */
+body {
+    padding: 0 10px; /* Add left and right padding to the body */
+    box-sizing: border-box; /* Ensure padding is inside the total width */
+}
+
+
+
+
+
+/* Styling for the Import/Export button */
+.import-export-button {
+    position: fixed;
+    top: 170px;  /* Place it in the upper-right corner */
+    right: 20px; /* Align to the right */
+    background-color: rgba(255, 255, 0, 0.2); /* Background for visibility */
+    color: #888888;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Round button */
+    opacity: 0.8;
+    width: 60px;  /* Fixed size or use a variable */
+    height: 60px; /* Fixed size or use a variable */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover effect for the button */
+.import-export-button:hover {
+    opacity: 1; /* Increase opacity on hover */
+}
+
+/* Optional: Adjust the font size for the symbol */
+.import-export-button {
+    font-size: 14px; /* Increase or decrease size as needed */
+}
+
+
+
+/* Styling for the Hamburger button */
+.hamburger {
+    position: fixed;
+    top: 170px;  /* Place it in the upper-right corner */
+    right: 20px; /* Align to the right */
+    background-color: rgba(255, 255, 0, 0.2); /* Dark background for visibility */
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Round button */
+    opacity: 0.8;
+    width: var(--button-size);
+    height: var(--button-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column; /* Stack the lines vertically */
+    z-index: 10;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover effect for the button */
+.hamburger:hover {
+    opacity: 1; /* Increase opacity on hover */
+}
+
+/* Hamburger icon: three horizontal lines */
+.hamburger-icon {
+    width: 25px;
+    height: 3px;
+    background-color: grey;
+    margin: 2px 0; /* Space between the lines */
+}
+
+
+
+
+
+/* Main menu container */
+.menu {
+    position: fixed;
+    top: 190px; /* Below the Hamburger button */
+    right: 90px; /* Align with the button on the right */
+    display: none; /* Initially hidden */
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    border-radius: 8px;
+    padding: 10px 0;
+    width: 200px;
+    font-size: 16px;
+}
+
+/* Menu items */
+.menu-item {
+    padding: 12px 16px;
+    color: black;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #f1f1f1;
+}
+
+/* Hide last item's border */
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+/* Submenu for Export/Import options */
+.submenu {
+    position: fixed;
+    top: 90px; /* Align with main menu */
+    right: 230px; /* Slightly to the left of the main menu */
+    display: none; /* Initially hidden, shown when triggered */
+    background-color: rgba(240, 240, 240, 0.95);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    border-radius: 8px;
+    padding: 10px 0;
+    width: 220px;
+	    font-size: 16px;
+
+}
+
+/* Submenu items */
+.submenu-item {
+    padding: 10px 16px;
+    color: black;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.submenu-item:hover {
+    background-color: #e0e0e0;
+}
+
+/* Reusable button style for both "file open" and "open dropdown" buttons */
+.button {
+    position: fixed;
+    right: 20px; /* Position the buttons on the right side */
+    background-color: rgba(255, 255, 0, 0.2);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Make the buttons round */
+    opacity: 0.7;
+    font-size: 14px;
+    width: var(--button-size); /* Round shape: same width and height */
+    height: var(--button-size);
+    display: flex;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    z-index: 10;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Add a shadow */
+}
+
+.button:hover {
+    opacity: 1; /* Full opacity on hover */
+}
+
+/* File open button positioned at the top-right */
+#file-import-btn {
+    top: 240px; /* Position at the top-right */
+}
+
+/* Open dropdown button positioned below the file open button */
+#menu-btn {
+    top: 310px; /* Position below the file open button */
+}
+
+/* Dropdown menu positioned on the right side, below the buttons */
+/* Ensure the dropdown can scroll if there are too many items */
+.dropdown {
+    position: fixed;
+    top: 170px; /* Adjust as per your design */
+    right: 90px; /* Adjust to your layout */
+    display: none; /* Hidden by default */
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    width: 250px;
+    border-radius: 8px;
+    max-height: 700px; /* Set a maximum height for the dropdown */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+.dropdown a {
+    color: black;
+    padding: 0px 0px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 0px solid #ddd;
+}
+
+.dropdown a:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown a:last-child {
+    border-bottom: none;
+}
+
+
+/* Hide the file input */
+#file-input {
+    display: none;
+}
+
+
+/* Container for the dropdown item and the edit/remove buttons */
+.dropdown-item-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px 2px;
+    font-size: 14px; /* Font size for dropdown items */
+}
+
+/* Styling for the remove button */
+.remove-btn {
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px;
+    font-size: 10px; /* Size for the remove button */
+    border-radius: 3px;
+}
+
+.remove-btn:hover {
+    background-color: darkred; /* Darker red on hover */
+}
+
+/* Edit button (pencil icon) styling */
+.edit-btn {
+    background-color: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 2px 4px !important; /* Ensure this padding is applied */
+    font-size: 10px !important; /* Ensure this font size is applied */
+    margin-left: 5px;
+    border-radius: 3px;
+}
+
+.edit-btn:hover {
+    background-color: darkblue; /* Darker blue on hover */
+}
+
+/* Delete button styling */
+.delete-btn {
+    background-color: #f44336; /* Red color */
+    color: white;
+    border: none;
+    padding: 2px 4px;
+    font-size: 12px; /* Size for the delete button */
+    border-radius: 3px;
+    margin-left: 10px; /* Space from the edit button */
+}
+
+.delete-btn:hover {
+    opacity: 0.8; /* Slightly transparent on hover */
+}
+
+
+
+
+    /* Modal Styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 10000; /* Very high z-index to be above all other elements */
+    left: 0;
+    top: 0;
+    width: 100vw;  /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    background-color: rgba(0,0,0,1); /* Fully opaque black background */
+    opacity: 0; /* Start as invisible */
+    transition: opacity 0.3s ease; /* Smooth fade-in */
+}
+
+.modal.show {
+    opacity: 1; /* When the modal is visible */
+}
+
+.modal-content {
+    background-color: #ffffff; /* Ensure modal content is opaque */
+    margin: auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 300px; 
+    text-align: center;
+    position: relative;
+    z-index: 10001; /* Make sure the content is also above other elements */
+}
+
+
+
+/* Action cell to ensure both buttons fit in one line */
+td.action-cell {
+    white-space: nowrap; /* Prevent the buttons from wrapping to a new line */
+    width: 70px; /* Adjust this value as needed to fit both buttons */
+}
+
+/* Edit and Delete buttons */
+.edit-btn, .delete-btn {
+    display: inline-block; /* Ensure both buttons sit next to each other */
+    margin-right: 3px; /* Add some space between the buttons */
+    padding: 4px 6px; /* Add some padding to make buttons larger */
+    font-size: 12px;
+    cursor: pointer;
+}
+
+
+
+/* Night Mode Button Styling */
+.night-mode-btn {
+    position: fixed;
+    top: 340px; /* Beneath the hamburger button */
+    right: 20px; /* Align to the right */
+    background-color: rgba(255, 255, 0, 0.2); /* Dark background for night mode */
+    color: #ffffff; /* White color for visibility */
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Round button */
+    opacity: 0.8;
+    width: var(--button-size);
+    height: var(--button-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.night-mode-btn:hover {
+    opacity: 1; /* Increase opacity on hover */
+}
+
+
+/* Night mode styles */
+body.night-mode {
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+}
+
+/* General night mode table styling */
+.night-mode .vocab-table,
+.night-mode .dropdown,
+.night-mode .menu,
+.night-mode .submenu {
+    background-color: #333333; /* Dark background for tables and menus */
+    color: #ffffff; /* Light text */
+    border-color: #444; /* Slightly lighter border for separation */
+}
+
+/* Night mode styling for menu items and containers */
+.night-mode .dropdown-item-container,
+.night-mode .menu-item,
+.night-mode .submenu-item {
+    background-color: #444444; /* Darker background for menu items */
+    color: #e0e0e0; /* Light text */
+    border-bottom: 1px solid #555; /* Border between items */
+}
+
+/* Hover effect for dropdown items and menu items */
+.night-mode .dropdown-item-container:hover,
+.night-mode .menu-item:hover,
+.night-mode .submenu-item:hover {
+    background-color: #555555; /* Hover background for items */
+    color: #ffffff; /* Ensure text is visible */
+}
+
+/* Night mode button styling */
+.night-mode button,
+.night-mode .edit-btn,
+.night-mode .remove-btn {
+    background-color: #555555; /* Button background */
+    color: #ffffff; /* Button text color */
+    border-color: #777777; /* Button border */
+}
+
+/* Specific styling for delete button in night mode */
+.night-mode .delete-btn {
+    color: #ff4444; /* Red color for delete button */
+}
+
+/* Night mode button hover effects */
+.night-mode .edit-btn:hover,
+.night-mode .remove-btn:hover {
+    background-color: #777777; /* Hover background for buttons */
+    color: #ffffff; /* Ensure text visibility */
+}
+
+/* Night mode styles for dropdown menu items (specific) */
+.night-mode .dropdown-item {
+    color: #e0e0e0; /* Light text color for dropdown items */
+}
+
+
+
+
+
+/* General button styling */
+#fontSizeCol4Decrease, #fontSizeCol4Increase, #fontSizeCol56Decrease, #fontSizeCol56Increase {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: rgba(255, 255, 0, 0.2); /* Yellow background */
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000; /* Make sure buttons are always on top */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+}
+
+#fontSizeCol4Decrease:hover, #fontSizeCol4Increase:hover, #fontSizeCol56Decrease:hover, #fontSizeCol56Increase:hover {
+    opacity: 1; /* Full opacity on hover */
+}
+
+/* Position for the bottom-left corner buttons (font-size control for column 3) */
+#fontSizeCol4Decrease {
+    bottom: 10px;
+    left: 10px;
+}
+
+#fontSizeCol4Increase {
+    bottom: 10px;
+    left: 60px; /* 10px space from the left button */
+}
+
+/* Position for the bottom-right corner buttons (font-size control for columns 4 and 5) */
+#fontSizeCol56Decrease {
+    bottom: 10px;
+    right: 60px; /* 10px space from the right button */
+}
+
+#fontSizeCol56Increase {
+    bottom: 10px;
+    right: 10px;
+}
+
+/* Adjust font-size for column 3 */
+.column4 {
+    font-size: 16px; /* Initial font-size for column 3 */
+}
+
+/* Adjust font-size for columns 4 and 5 */
+.column56 {
+    font-size: 16px; /* Initial font-size for columns 4 and 5 */
+}
+
+
+
+
+/* Toggle Edit/Delete Button Styling */
+.toggle-edit-btn {
+    position: fixed;
+    top: 380px; /* Beneath the night mode button */
+    right: 20px; /* Align to the right */
+    background-color: rgba(255, 255, 0, 0.2); /* Similar styling to the night mode button */
+    color: #888888; /* White color for visibility */
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Round button */
+    opacity: 0.8;
+    width: var(--button-size);
+    height: var(--button-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-edit-btn:hover {
+    opacity: 1; /* Increase opacity on hover */
+}
+
+/* Initially hide column 2 (edit/delete buttons) */
+.hide-edit-delete td:nth-child(2) {
+    display: none;
+}
+
+/* Show column 2 (edit/delete buttons) when toggled */
+.show-edit-delete td:nth-child(2) {
+    display: table-cell;
+}
+
+
+
+.header-container {
+    position: relative; /* Allows absolute positioning of the title */
+    width: 100%; /* Full width */
+}
+.hidden-header {
+    display: none; /* This will hide the header */
+}
+
+h1 {
+    position: absolute;
+    right: 70px; /* Position the title 20px from the left */
+    top: 20px; /* Position the title 20px from the top of the header */
+    color: #f0f0f0; /* Title color */
+    font-size: 24px; /* Font size for the title */
+    margin: 0;
+    z-index: 2; /* Ensure the title appears on top of the image */
+	    font-weight:normal
+
+}
+
+h3 {
+    font-size: 16px;
+    font-weight: normal; /* Not bold */
+	padding: 0; /* Remove padding if any */
+	
+}
+
+.banner-image {
+    width: 100%; /* Banner spans the entire width */
+    height: auto; /* Maintain the banner's aspect ratio */
+    z-index: 1; /* Ensure the image is below the title */
+}
+
+.test-button {
+    position: fixed;
+    top: 450px; /* Adjusted to be just below the menu button */
+    right: 20px; /* Align with the other buttons on the right side */
+    background-color: rgba(255, 255, 0, 0.2); /* Same styling as other buttons */
+    color: #000000;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Round button */
+    opacity: 0.7;
+    font-size: 14px;
+    width: var(--button-size); /* Same width and height */
+    height: var(--button-size);
+    display: flex;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    z-index: 10;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow */
+}
+
+
+
+.test-button:hover {
+    opacity: 1; /* Increase opacity on hover */
+}
+
+
+
+
+
+
+
+
+
+/* Common button styles */
+/* Common button styles */
+
+.test-btn {
+    position: fixed;
+    right: 0;
+    width: 10%; /* Take 10% of screen width */
+    background-color: #bbbbbb; /* #4CAF50;*/
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px; /* Rounded corners */
+    margin: 2px; /* 2px free space around each button */
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.3); /* Add shadow for visual depth */
+}
+
+#test-btn {
+    display: block;
+}
+
+
+
+/* Hide element class */
+.hidden {
+    display: none;
+}
+
+/* Show Button (Top 80% of the screen) */
+#show-btn {
+    top: 0;
+    height: 80vh; /* 80% of the screen height */
+}
+
+/* Exit Button (Bottom 20% of the screen) */
+#exit-btn {
+	    background-color: #dddddd; /* #4CAF50;*/
+
+    bottom: 0;
+    height: 20vh; /* 20% of the screen height */
+}
+
+/* OK Button (Top 40% of the screen after Show is clicked) */
+#ok-btn {
+    top: 0;
+    height: 40vh; /* 40% of the screen height */
+}
+
+/* Show Again Button (Middle 40% of the screen after Show is clicked) */
+#show-again-btn {
+    top: 40vh; /* Start below the OK button */
+    height: 40vh; /* 40% of the screen height */
+}
+
+
+
+
+
+
+
+
+
+/* Central space container (default height set to a very small value) */
+/* Central space container for test phase */
+#central-space {
+    display: flex;
+    width: 90%; /* The central space will take up 80% of the screen */
+    height: 100vh; /* Full height of the viewport */
+    margin-right: 20%; /* Leave space for buttons */
+    border: 0px solid black; /* Border for visualization */
+}
+
+/* Image display section (left side) */
+#image-display {
+    flex: 0 0 40%; /* 40% of the 80% width (or 32% of the total screen width) */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align content to the top */
+    background-color: #ffffff; /* White background */
+    padding: 10px;
+    max-height: 100%; /* Ensure the height doesn't exceed container */
+    overflow: hidden; /* Prevent overflow */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow for contrast */
+    border: 0px solid red; /* Red border for visualization */
+}
+
+/* Ensure the image fits within its container */
+#image-display img {
+    max-width: 100%; /* Image can take up at most 100% of its container width */
+    max-height: 100%; /* Image can take up at most 100% of its container height */
+    object-fit: contain; /* Scale the image to fit inside the container, maintaining aspect ratio */
+    display: block; /* Ensure it is displayed as a block element */
+}
+
+/* Test display section (right side) */
+#test-display {
+    flex: 0 0 60%; /* 60% of the 80% width (or 48% of the total screen width) */
+    background-color: #ffffff; /* White background */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center; /* Center the test content horizontally */
+    height: 100vh; /* Full viewport height */
+    border: 0px solid blue; /* Blue border for visualization */
+}
+
+/* Ensure the central container adjusts during the test */
+#central-space.test-mode {
+    display: flex;
+    width: 80%; /* Ensure it takes up 80% of the screen width */
+    height: 100vh; /* Full height during the test phase */
+    margin-right: 20%; /* Leave space for buttons */
+    border: 0px solid black; /* Border for visualization */
+}
+
+
+
+
+/* General styles for buttons */
+.pleco-button, .sound-button, .pronounce-button {
+    padding: 1px 3px; /* Uniform padding for a larger clickable area */
+    border: 1px solid #ccc; /* Light border */
+    background-color: #f0f0f0; /* Light grey background */
+    text-decoration: none; /* Remove underline */
+    font-size: 8px; /* Readable font size */
+    font-family: Arial, sans-serif; /* Simple, clean font */
+    border-radius: 5px; /* Rounded corners for aesthetics */
+    cursor: pointer; /* Pointer cursor to indicate interactivity */
+    margin: 0 2px; /* Small margin between buttons */
+    transform: scale(1); /* Scale down to 60% of the original size */
+}
+
+/* Hover effects for interactivity */
+.pleco-button:hover, .sound-button:hover, .pronounce-button:hover {
+    background-color: #d9d9d9; /* Darker background on hover */
+    border-color: #b3b3b3; /* Darker border on hover */
+}
+
+/* Hanzi (Chinese characters) font size and styling */
+.hanzi {
+    font-size: 12px; /* Default font size for Hanzi, adjustable */
+    font-family: 'SimSun', 'Arial', sans-serif; /* Fallback fonts */
+    padding-right: 4px; /* Space after the Hanzi */
+}
+
+/* Text (Pinyin) styling */
+.text {
+    font-size: 8px; /* Pinyin font size, adjustable */
+    font-family: 'Arial', sans-serif; /* Simple, clean font */
+    color: #333; /* Dark grey color for text */
+    display: inline-block; /* Keep text inline */
+}
+
+/* Inline form styling to make the button and text align nicely */
+.inline-form {
+    display: inline-block;
+    margin-left: 2px; /* Space between form and adjacent text */
+}
+
+
+
+
+
+
+#font-size-controls {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px; /* Adds space between the Q and A buttons */
+}
+
+.font-control-button {
+    background-color: rgba(255, 255, 0, 0.2);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%; /* Round shape */
+    opacity: 0.7;
+    font-size: 14px;
+    width: 50px; /* Same width and height for round shape */
+    height: 50px;
+    display: flex;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    z-index: 10;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Shadow effect */
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.font-control-button:hover {
+    background-color: rgba(255, 255, 0, 0.4);
+    transform: scale(1.1); /* Zoom effect on hover */
+}
+
+
+
+
+
+/* Ensure the buttons in the 3rd column are kept in one row without wrapping */
+#vocabTable th:nth-child(3),
+#vocabTable td:nth-child(3) {
+    white-space: nowrap; /* Prevent line breaks */
+}
+/* New rule to add a right margin to the table */
+#vocabTable {
+    margin-right: 100px; /* Adds a margin of 100px to the right */
+    table-layout: auto; /* Adjusts the layout so that columns can resize based on content */
+    width: calc(100% - 100px); /* Ensures the table width accounts for the margin */
+}
+
+/* General button styling (G, P, Pronunciation) */
+.pleco-button, .sound-button, .pronounce-button {
+    padding: 2px 5px; /* Adjust padding for smaller button sizes */
+    font-size: 10px;  /* Adjust font size if needed */
+    margin: 0 2px;    /* Ensure small space between buttons */
+}
+
+
+
+
+
+
+#custom-alert {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    padding: 15px;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+    z-index: 9999; /* Ensure it's on top of other elements */
+    font-size: 14px;
+}
+
+
+
+
+
+#languageSelectionModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #000;
+    z-index: 1000;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    max-height: 400px; /* Set a maximum height */
+    overflow-y: auto;  /* Enable vertical scrolling */
+}
+
+#languageSelectionModal h3 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#languageSelectionModal button {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    width: 100%;
+    border: none;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#languageSelectionModal button.active {
+    background-color: #d3d3d3;
+}
+
+
+/* Small central alert box styling */
+.small-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 120, 128, 0.9); /* Semi-transparent black */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: normal;
+    z-index: 10000;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3); /* A bit of shadow */
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease; /* Smooth fade-in/fade-out */
+}
+
+#results-display {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed positioning to stay on the viewport */
+    top: 50%; /* Position from the top */
+    left: 50%; /* Position from the left */
+    transform: translate(-50%, -50%); /* Center the div */
+    border: 1px solid #ccc; /* Add a border */
+    padding: 20px; /* Add padding */
+    background-color: white; /* Set background color */
+    z-index: 1000; /* Ensure it appears above other content */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+    max-height: 80%; /* Limit max height */
+    overflow-y: auto; /* Allow scrolling if content exceeds max height */
+}
+
+
+
+
+
+#vocabInfoTable {
+    width: calc(100% - 150px); /* Full width minus 100px for the margin */
+    max-width: 1200px; /* Optional: Set a max-width for better responsiveness */
+    border-collapse: collapse; /* Collapse borders */
+    margin: 20px auto; /* Center the table and add space around it */
+}
+
+#vocabInfoTable td {
+    border: 1px solid #ccc; /* Light grey border */
+    padding: 1px; /* Padding inside cells */
+    text-align: center; /* Center align text */
+    font-size: 1.0em; /* Slightly larger font */
+}
+
+#vocabInfoTable td:first-child {
+    font-weight: normal; /* Make the title cell bold */
+    background-color: #e6f7ff; /* Light grey background for the title */
+}
+
+#vocabInfoTable td:nth-child(2),
+#vocabInfoTable td:nth-child(3),
+#vocabInfoTable td:nth-child(4),
+#vocabInfoTable td:nth-child(5) {
+    background-color: #e6f7ff; /* Light blue background for info cells */
+}
+
+#vocabInfoTable td:nth-child(6),
+#vocabInfoTable td:nth-child(7) {
+    background-color: #e6f7ff; /* White background for empty cells */
+}
+
+
+
+
+
+/* Modal Overlay */
+#modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    z-index: 999; /* Ensure it's above other elements */
+    display: none; /* Initially hidden */
+}
+
+/* Modal Styles */
+#importModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the modal */
+    background-color: white; /* Background color */
+    padding: 20px; /* Space inside the modal */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+    z-index: 1000; /* Above the overlay */
+    display: none; /* Initially hidden */
+}
+
+

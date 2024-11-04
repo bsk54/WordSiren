@@ -1,0 +1,4246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!--************************************************************************************************-->
+<!--******************************************* Word Siren *********************************-->
+<!--**************************************** November 4, 2024 ************************************-->
+<!--************************************************************************************************-->
+<!--******************************************* Version 1.0 *************************************-->
+<!--**************************************** November 4, 2024 ************************************-->
+<!--************************************************************************************************-->
+<!---------------------------------------------------------------------------------------------------->
+<!------------------------------------ Code by: Bernd Sebastian Kamps -------------------------------->
+<!---------------------------------------------------------------------------------------------------->
+<!-- Description: Word Siren is a web-based tool designed to accelerate language learning by enabling -->
+<!-- users to master 1000 and more words in a month. The application offers interactive vocabulary lists, -->
+<!-- quizzes, and a user-friendly interface to facilitate effective and engaging learning experiences.-->
+<!--************************************************************************************************-->
+<!-- License: Word Siren is released under the MIT License. Free for personal and commercial use, -->
+<!-- as long as proper credit is given. See LICENSE.txt in the project repository for more details. -->
+<!--************************************************************************************************-->
+<!-- Repository: https://github.com/bsk54/WordSiren.git -->
+<!-- Documentation: https://aioPop.com/WordSiren -->
+<!--************************************************************************************************-->
+<!-- Acknowledgments: Special thanks to all contributors and the open-source community for support and -->
+<!-- contributions to this project. -->
+<!--************************************************************************************************-->
+<!-- Note: Word Siren is free and open source. We encourage modifications and sharing, -->
+<!-- but please give proper credit to the original authors and maintain this header. -->
+<!--************************************************************************************************-->
+
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Siren Vocabulary Trainer</title>
+    <link rel="stylesheet" href="styles.css"> 
+
+</head>
+<body>
+<div class="header-container">
+    <h1>Word Siren</h1>
+    <img id="random-banner" src="ws.jpg" alt="Banner" class="banner-image">
+</div>
+</head>
+
+
+<!--
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Mach 1: Master 1000 Words in a Month</title>
+    <link rel="stylesheet" href="styles.css">
+
+
+<body>
+<div class="header-container">
+
+    <img id="random-banner" src="ChineseMach1c.jpg" alt="Banner" class="banner-image">
+</div>
+-->
+
+<h3 id="vocabListTitle"></h3> <!-- Keep this outside the table for clarity -->
+
+<table id="vocabInfoTable">
+    <tr>
+        <td id="wordsInTestCell"></td>
+        <td id="maxWordsCell"></td>
+		<td id="testScore"></td>
+        <td id="speechSpeedCell"></td>
+         <td id="inputModus"></td>
+        <td id="testDirection"></td> 
+       <td id="currentLanguageCell"></td>
+        <td id="emptyCell2"></td>
+    </tr>
+</table>
+<!--
+
+7. Listening Mode (Audio-First Test)
+Mechanics: The system plays the pronunciation of the word (using l1 or l2), and the user must either select or type the correct corresponding word from the options or based on their memory.
+Example: The system plays the sound of "chien" (dog in French), and the user must recognize or type the word "dog."
+Evaluation: The system checks for correct answers, and if incorrect, provides corrective feedback.
+Benefit: This mode helps the user practice listening comprehension in addition to reading or speaking.
+
+
+{"number":1,"language1":"舆论","language2":"yu2lun4","language3":"noun 1 public opinion; publicity 2 media","wrong":0,"right":0,"total":0,"lastView":null,"inExamination":false,"currentStatus":0,"level":0,"nextPresentation":null}
++
+nextPresentationTimestamp
+
+{"number":1,"l1":"舆论","l2":"yu2lun4","l3":"noun 1 public opinion; publicity 2 media","w":0,"r":0,"t":0,"lV":null,"inEx":false,"round":0,"level":0,"nP":null}
+
+<audio id="beepSound" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAABCxAgAEABAAZGF0YYQAAAAAAA=="></audio>
+
+
+-->
+
+
+<button id="test-btn" class="test-button">Test</button>
+
+
+<!-- Test buttons, hidden by default -->
+<button id="show-btn" class="test-btn hidden" style="top: 0; height: 80%;">Show</button>
+<button id="exit-btn" class="test-btn hidden" style="bottom: 0; height: 20%;">Exit</button>
+
+<!-- OK and Show Again buttons, also hidden by default -->
+<button id="ok-btn" class="test-btn hidden" style="top: 0; height: 40%;">OK</button>
+<button id="show-again-btn" class="test-btn hidden" style="top: 40%; height: 40%;">Show Again</button>
+
+
+
+<div id="modalOverlay"></div>
+<div id="importModal">
+    <div>
+        <h2>Import Vocabulary</h2>
+        <label>
+            <input type="radio" name="importOption" value="new" checked>
+            Create a new vocab list
+        </label>
+        <br>
+        <label>
+            <input type="radio" name="importOption" value="append">
+            Add to existing vocab list
+        </label>
+        <br>
+        <textarea id="vocabInput" rows="10" cols="30" placeholder="Enter your vocabulary here..."></textarea>
+        <br>
+        <button id="submitImport">Import</button>
+        <button id="closeModal">Close</button>
+    </div>
+</div>
+
+
+
+<!-- Floating Button for File Import -->
+<button id="file-import-btn" class="button" onclick="triggerFileInput();">
+    📂
+</button>
+
+<!-- Hidden File Input -->
+<input type="file" id="file-input" accept=".txt" style="display: none;" onchange="handleFileImport(event)">
+<!-- Hidden File Input for .pics File -->
+<input type="file" id="pics-file-input" accept=".txt" style="display:none;" onchange="handlePicsFileImport(event)">
+
+
+<!-- Floating Button for List Menu -->
+<button id="menu-btn" class="button" onclick="toggleDropdown()">
+    📋
+</button>
+
+
+
+
+<!-- Dropdown Menu for List Selection -->
+<div id="dropdown" class="dropdown">
+    <!-- Menu items will be added dynamically -->
+</div>
+    
+    <!-- Hidden File Input -->
+    <input type="file" id="file-input" accept=".txt" onchange="handleFileImport(event)">
+
+    <!-- Hamburger Button -->
+
+
+
+
+<button id="hamburger-btn" class="import-export-button">I/E</button>
+
+
+	<!-- Night Mode Toggle Button -->
+	<!--
+	<button id="night-mode-btn" class="night-mode-btn">
+		🌙
+	</button>
+-->
+
+<button id="toggle-edit-delete-btn" class="toggle-edit-btn">✎</button>
+
+
+<!-- Bottom-left corner buttons for controlling font size of column 3 -->
+<button id="fontSizeCol4Decrease" title="Decrease Font Size Column 3">-</button>
+<button id="fontSizeCol4Increase" title="Increase Font Size Column 3">+</button>
+
+<!-- Buttons to control font size of columns 5 and 6 -->
+<button id="fontSizeCol56Decrease" title="Decrease Font Size Columns 5 & 6">-</button>
+<button id="fontSizeCol56Increase" title="Increase Font Size Columns 5 & 6">+</button>
+
+
+
+
+    <!-- Dropdown Menu for Hamburger -->
+    <div class="menu">
+        <div class="menu-item" onclick="exportToFile()">Export to File</div>
+        <div class="menu-item" id="import-file-btn">Import from File</div>
+    </div>
+	
+	
+	
+    <!-- Submenu for Export/Import -->
+<!-- Submenu for Export/Import -->
+	<div class="submenu" id="export-import-submenu">
+		<div class="submenu-item" onclick="saveToLocalStorage()">Export to Browser Memory</div>
+		<div class="submenu-item" onclick="exportToFile()">Export to File</div>
+		<div class="submenu-item" id="import-file-btn">Import from File</div> <!-- Correctly placed -->
+	</div>
+<!--
+    <div class="menu">
+        <div class="menu-item" onclick="showExportImportMenu()">Export/Import</div>
+        <div class="menu-item">Fonts</div>
+    </div>
+-->
+
+
+	<!-- Hidden File Input for Importing Data -->
+	<input type="file" id="file-input-import" style="display: none;" accept=".txt">
+
+
+    <!-- Table to Display Imported Vocabulary -->
+	
+	
+
+
+
+	<!-- Table to Display Imported Vocabulary -->
+	<div class="vocab-table">
+		<table id="vocabTable">
+			<tbody>
+				<!-- Rows will be added here dynamically -->
+			</tbody>
+		</table>
+	</div>
+	
+	
+	
+
+    <div>
+        <!--h3>Loaded Lists:</h3-->
+        <ul id="loadedLists">
+            <!-- List of loaded vocab files will be displayed here -->
+        </ul>
+    </div>
+	
+	
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit Vocabulary Entry</h2>
+        <label for="editLanguage1">Language 1:</label>
+        <input type="text" id="editLanguage1"><br><br>
+        <label for="editLanguage2">Language 2:</label>
+        <input type="text" id="editLanguage2"><br><br>
+        <label for="editLanguage3">Language 3:</label>
+        <input type="text" id="editLanguage3"><br><br>
+        <button id="saveChanges">Save Changes</button>
+    </div>
+</div>	
+
+
+<div id="test-complete-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Test Completed!</h2>
+        <p>Congratulations, you've completed the test.</p>
+        <button id="close-modal-btn">Close</button>
+    </div>
+</div>
+
+<div id="results-display" style="display: none; border: 1px solid #ccc; padding: 10px; margin-top: 20px; max-height: 400px; overflow-y: auto;">
+    <h2>Distribution</h2>
+    <pre id="results-text" style="white-space: pre-wrap;"></pre>
+    <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    <button onclick="hideResults()">Close</button>
+</div>
+
+
+
+<!-- Container for the central space with image and test -->
+<div id="central-space" class="central-space">
+    <!-- Left half for the image -->
+    <div id="image-display" class="image-display"></div>
+
+    <!-- Right half for the test -->
+    <div id="test-display" class="test-display">
+        <div id="word-display" class="word-display"></div>
+
+        <!-- Font size control buttons (Q and A) -->
+		<!--
+        <div id="font-size-controls">
+            <button class="font-control-button" id="q-button">Q</button>
+            <button class="font-control-button" id="a-button">A</button>
+        </div>
+		-->
+    </div>
+</div>
+
+
+
+
+<!-- Modal Structure -->
+
+
+
+
+
+    <script>
+let lastWord=0;	
+let wScore=0;
+let rScore=0;
+	let currentIndex = 0; // Track the current word index globally
+let currentLanguage = 'zh-CN'; // Default language is Chinese
+let currentLanguageIndex = 0;
+let isSwitched = false; // Track the state of the switch (l1 as default)
+let isInputMode = false;
+
+let vocabLists = [];
+let previousContent = null; // To store the previous content
+let answerPx = 20; // Default font size for answers (l2 and l3)
+let questionPx = 28; // Default font size for question (l1)
+let maxRounds = 2; // Default font size for question (l1)
+let maxWords = 400; // max words to be studied from a given list
+let wordsInTest = 3; // Default value for the number of words in the test
+let speechSpeed = .7; // 
+let playSound = false; // Initialize the variable, initially no sound
+let isQuestionPhase = false; // This flag will track whether we're in the question phase
+// let currentSortIndex = 0; // Start with the first sorting method
+let currentSortMethod = 0; // 0: sort by 't', 1: sort by 'PrTS', 2: sort by 'number', 3: level
+
+let giro=0;
+
+
+
+/*
+// List of languages and their codes
+const availableLanguages = [
+    { label: 'Chinese (Cantonese)', code: 'zh-HK' },
+    { label: 'Chinese (Mandarin)', code: 'zh-CN' },
+    { label: 'Czech', code: 'cs-CZ' },
+    { label: 'Danish', code: 'da-DK' },
+    { label: 'Dutch', code: 'nl-NL' },
+    { label: 'English (US)', code: 'en-US' },
+    { label: 'English (UK)', code: 'en-GB' },
+    { label: 'Finnish', code: 'fi-FI' },
+    { label: 'French (Canada)', code: 'fr-CA' },
+    { label: 'French (France)', code: 'fr-FR' },
+    { label: 'German', code: 'de-DE' },
+    { label: 'Greek', code: 'el-GR' },
+    { label: 'Hebrew', code: 'he-IL' },
+    { label: 'Hindi', code: 'hi-IN' },
+    { label: 'Hungarian', code: 'hu-HU' },
+    { label: 'Indonesian', code: 'id-ID' },
+    { label: 'Italian', code: 'it-IT' },
+    { label: 'Japanese', code: 'ja-JP' },
+    { label: 'Korean', code: 'ko-KR' },
+    { label: 'Malay', code: 'ms-MY' },
+    { label: 'Norwegian', code: 'no-NO' },
+    { label: 'Polish', code: 'pl-PL' },
+    { label: 'Portuguese (Brazil)', code: 'pt-BR' },
+    { label: 'Portuguese (Portugal)', code: 'pt-PT' },
+    { label: 'Romanian', code: 'ro-RO' },
+    { label: 'Russian', code: 'ru-RU' },
+    { label: 'Spanish (Mexico)', code: 'es-MX' },
+    { label: 'Spanish (Spain)', code: 'es-ES' },
+    { label: 'Swedish', code: 'sv-SE' },
+    { label: 'Thai', code: 'th-TH' },
+    { label: 'Turkish', code: 'tr-TR' },
+    { label: 'Vietnamese', code: 'vi-VN' }
+];
+*/
+
+// List of languages and their codes
+const availableLanguages = [
+    { label: 'Chinese (Mandarin)', code: 'zh-CN' },
+    { label: 'English (US)', code: 'en-US' },
+    { label: 'English (UK)', code: 'en-GB' },
+    { label: 'French (France)', code: 'fr-FR' },
+    { label: 'German', code: 'de-DE' },
+    { label: 'Hindi', code: 'hi-IN' },
+    { label: 'Indonesian', code: 'id-ID' },
+    { label: 'Italian', code: 'it-IT' },
+    { label: 'Japanese', code: 'ja-JP' },
+    { label: 'Portuguese (Brazil)', code: 'pt-BR' },
+    { label: 'Portuguese (Portugal)', code: 'pt-PT' },
+    { label: 'Spanish (Spain)', code: 'es-ES' },
+    { label: 'Vietnamese', code: 'vi-VN' }
+];
+
+
+// Array of predefined font sizes for l1 (question) and l2/l3 (answers)
+let questionFontSizes = [16, 20, 24, 28, 32, 40]; // Predefined font sizes for l1
+let answerFontSizes = [12, 14, 16, 18, 20, 24];  // Predefined font sizes for l2/l3
+// let currentFontSizeIndex = 0; // Track the current index in the font sizes array
+
+
+// Ensure currentFontSizeIndex starts at the correct position
+let currentFontSizeIndex = questionFontSizes.indexOf(questionPx);
+if (currentFontSizeIndex === -1) currentFontSizeIndex = 0; // If not found, start at the first font size
+
+let currentAnswerFontSizeIndex = answerFontSizes.indexOf(answerPx);
+if (currentAnswerFontSizeIndex === -1) currentAnswerFontSizeIndex = 1; // Default to the second font size
+
+
+// Initial font sizes for the columns
+let drive = "d";
+let fontSizeCol4 = 20; // Default font size for column 3
+let fontSizeCol56 = 16; // Default font size for columns 4 and 5
+
+// Initial width for column 3
+let col4Width = 180; // Default width in pixels for column 3
+let col3Width = 80; // Default width in pixels for column 3
+
+
+
+
+
+
+
+    // Function to save the current vocabulary lists to localStorage
+
+/*
+// Initial font sizes for the columns
+let fontSizeCol3 = 20; // Default font size for column 3
+let fontSizeCol45 = 16; // Default font size for columns 4 and 5
+
+// Initial width for column 3
+let col3Width = 120; // Default width in pixels for column 3
+*/
+// Function to update the font size of column 4 (l1)
+function updateFontSizeCol4() {
+    const col4Cells = document.querySelectorAll('#vocabTable td:nth-child(4)'); // 4th column is l1
+    col4Cells.forEach(cell => {
+        cell.style.fontSize = `${fontSizeCol4}px`;
+    });
+
+    // Update column width
+    document.querySelectorAll('#vocabTable th:nth-child(4), #vocabTable td:nth-child(4)').forEach(cell => {
+        cell.style.width = `${col4Width}px`;
+    });
+}
+
+// Function to update the font size of columns 5 (l2) and 6 (l3)
+function updateFontSizeCol56() {
+    const col5Cells = document.querySelectorAll('#vocabTable td:nth-child(5)'); // 5th column is l2
+    const col6Cells = document.querySelectorAll('#vocabTable td:nth-child(6)'); // 6th column is l3
+
+    col5Cells.forEach(cell => {
+        cell.style.fontSize = `${fontSizeCol56}px`; // Adjust l2 font size
+    });
+    col6Cells.forEach(cell => {
+        cell.style.fontSize = `${fontSizeCol56}px`; // Adjust l3 font size
+    });
+}
+
+
+// Add click event to the testDirection cell
+    const testDirectionCell = document.getElementById('testDirection');
+    testDirectionCell.addEventListener('click', toggleLanguageSwitch);
+	
+	document.getElementById('wordsInTestCell').addEventListener('click', function() {
+    showCustomAlertEnd("5: Decrease | 6: Increase"); // Show the message when clicked
+	});
+
+	document.getElementById('maxWordsCell').addEventListener('click', function() {
+    showCustomAlertEnd("7: Decrease | 8: Increase  ||  u: 5 | U: 50"); // Show the message when clicked
+	});
+	
+	document.getElementById('speechSpeedCell').addEventListener('click', function() {
+    showCustomAlertEnd("9: Decrease | 0: Increase"); // Show the message when clicked
+	});	
+	
+	document.getElementById('testScore').addEventListener('click', function() {
+    showCustomAlertEnd("Hello World!"); // Show the message when clicked
+	});	
+	
+
+		
+
+// Event listeners for the buttons
+document.getElementById('fontSizeCol4Decrease').addEventListener('click', () => {
+    fontSizeCol4 = Math.max(10, fontSizeCol4 - 2); // Decrease font size, min 10px
+    updateFontSizeCol4();
+});
+
+document.getElementById('fontSizeCol4Increase').addEventListener('click', () => {
+    fontSizeCol4 = Math.min(40, fontSizeCol4 + 2); // Increase font size, max 40px
+    updateFontSizeCol4();
+});
+
+document.getElementById('fontSizeCol56Decrease').addEventListener('click', () => {
+    fontSizeCol56 = Math.max(10, fontSizeCol56 - 2); // Decrease font size, min 10px
+
+    // fontSizeCol5 = Math.max(10, fontSizeCol5 - 2); // Decrease font size for l2/l3, min 10px
+    // fontSizeCol6 = fontSizeCol5; // Keep sizes of l2 and l3 consistent
+    updateFontSizeCol56(); // Apply the update to both columns
+});
+
+document.getElementById('fontSizeCol56Increase').addEventListener('click', () => {
+    fontSizeCol56 = Math.max(10, fontSizeCol56 + 2); // Decrease font size, min 10px
+
+    // fontSizeCol5 = Math.min(40, fontSizeCol5 + 2); // Increase font size for l2/l3, max 40px
+    // fontSizeCol6 = fontSizeCol5; // Keep sizes of l2 and l3 consistent
+    updateFontSizeCol56(); // Apply the update to both columns
+});
+
+
+
+// Function to trigger the hidden file input
+function triggerFileInput() {
+    console.log('File Import button clicked'); // Debugging log
+    document.getElementById('file-input').click();
+}
+
+function handleFileImport(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+        console.log('File selected:', file.name); // Debugging log
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const content = e.target.result;
+            const lines = content.split('\n'); // Split content into lines
+            const nonEmptyLines = lines.filter(line => line.trim() !== ''); // Filter out empty lines
+            
+            // Check if the first valid line contains either TAB or #
+            if (nonEmptyLines.length > 0) {
+                const firstLine = nonEmptyLines[0];
+                if (!firstLine.includes('\t') && !firstLine.includes('#')) {
+                    alert('The first valid line must contain either a TAB or #.');
+                    return; // Stop the import if the condition is not met
+                }
+            } else {
+                alert('The file does not contain any valid lines.');
+                return; // Stop the import if there are no valid lines
+            }
+
+            const vocabArray = parseVocabularyFile(content); // Pass the entire content to parseVocabularyFile
+
+            // Loop to assign numbers and images directly to each vocab item
+            let currentNumber = 1; // Initialize a counter for numbering
+            for (let i = 0; i < vocabArray.length; i++) {
+                if (vocabArray[i].l1 && vocabArray[i].l2) { // Check if both l1 and l2 are present
+                    vocabArray[i].number = currentNumber; // Assign the current number
+                    currentNumber++; // Increment the counter for the next valid item
+
+                    const imageName = String(currentNumber).padStart(5, '0') + '.jpg'; // Use currentNumber for image name
+                    vocabArray[i].image = imageName; // Assign the generated image name to the "image" field of each vocab item
+                }
+            }
+
+            // Create the vocabList object without the imageArray
+            const vocabList = {
+                fileName: file.name, // Name of the file
+                trueName: file.name, // Initially set trueName to fileName
+                listCreated: new Date().toLocaleString(), // Date and time when the list was added
+                lastSeen: new Date().toLocaleString(), // Set lastSeen to the current date and time
+                lastSeenTimestamp: Date.now(), // Numeric timestamp for easy comparison
+                vocabArray: vocabArray // The vocabulary data with images included
+            };
+
+            vocabLists.push(vocabList); // Add the new list to the array
+
+            displayVocabulary(vocabArray, file.name); // Display the vocabulary of the newly added list
+            displayLoadedLists(); // Show the list of loaded files
+            updateDropdownMenu(); // Update the dropdown menu with the new list
+            saveToLocalStorage(); // Save the updated vocabLists to localStorage
+
+            // After adding the new list, update the vocabListTitle with trueName or fileName
+            const vocabListTitle = document.getElementById('vocabListTitle');
+            if (vocabListTitle) {
+                vocabListTitle.textContent = `${vocabList.trueName || vocabList.fileName}`;
+            }
+        };
+
+        reader.readAsText(file); // Read the file as text
+    } else {
+        console.log('No file selected'); // Debugging log
+    }
+}
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+
+
+
+// Add click event to the inputModus cell to toggle input mode
+    const inputModusCell = document.getElementById('inputModus');
+    inputModusCell.addEventListener('click', toggleTestMode); // Trigger toggleTestMode on click
+	
+   const storedSettings = localStorage.getItem('settings');
+    if (storedSettings) {
+const settings = JSON.parse(storedSettings);
+
+        // Restore saved settings or keep default values
+
+
+
+
+		// Restore saved settings or keep default values
+		currentLanguage = settings.currentLanguage || 'zh-CN';
+		answerPx = settings.answerPx !== undefined ? settings.answerPx : 20;
+		questionPx = settings.questionPx !== undefined ? settings.questionPx : 28;
+		maxRounds = settings.maxRounds !== undefined ? settings.maxRounds : 2;
+		wordsInTest = settings.wordsInTest !== undefined ? settings.wordsInTest : wordsInTest; // Keep default if undefined
+		maxWords = settings.maxWords !== undefined ? settings.maxWords : 400;
+		speechSpeed = settings.speechSpeed !== undefined ? settings.speechSpeed : 0.7;
+		isSwitched = settings.isSwitched !== undefined ? settings.isSwitched : false;
+		fontSizeCol4 = settings.fontSizeCol4 !== undefined ? settings.fontSizeCol4 : 20;
+		fontSizeCol56 = settings.fontSizeCol56 !== undefined ? settings.fontSizeCol56 : 16;
+
+		col4Width = settings.col4Width !== undefined ? settings.col4Width : 180;
+		col3Width = settings.col3Width !== undefined ? settings.col3Width : 80;		
+
+/*
+        // Apply the restored font size immediately after restoring
+        updateFontSizeCol4();
+        updateFontSizeCol56();
+*/		
+        // alert(`Restored value of wordsInTest: ${wordsInTest}`);
+
+        console.log('Restored wordsInTest from localStorage:', wordsInTest); // Debugging log
+    } else {
+        console.log('No settings found, using default wordsInTest:', wordsInTest);
+    }
+	
+
+
+
+    // Call the function to restore vocab lists on page load
+    restoreVocabLists();
+	
+	
+	
+	window.addEventListener('beforeunload', function() {
+    saveToLocalStorage();
+    console.log('Settings saved before page unload.');
+});
+
+
+
+
+    // Attach event listener to the night mode button after the DOM is loaded
+    const nightModeButton = document.getElementById('night-mode-btn');
+    if (nightModeButton) {
+        nightModeButton.addEventListener('click', function() {
+            document.body.classList.toggle('night-mode');
+            console.log('Night mode toggled');
+        });
+    } else {
+        console.error("Night mode button not found in the DOM.");
+    }
+	
+	
+	
+	
+// Attach keyboard shortcut (key 'n') to toggle night mode
+
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === 'n') {
+        document.body.classList.toggle('night-mode');
+        console.log('Night mode toggled with key "n"');
+    }
+});
+
+
+
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'p' || event.key === 'P') {
+        console.log("p pressed, prompting for image assignment choice");
+
+        // Ask the user for their choice (A: automatic, B: custom .pics file)
+        const userChoice = prompt("Choose (A) for automatic image assignment or (B) to import from a .pics file.");
+
+        // Process the user's choice
+        if (userChoice) {
+            if (userChoice.toUpperCase() === 'A') {
+                console.log("User chose automatic image assignment.");
+                assignImagesToCurrentList(); // Trigger the automatic assignment function
+            } else if (userChoice.toUpperCase() === 'B') {
+                console.log("User chose custom image assignment via .pics file.");
+                document.getElementById('pics-file-input').click(); // Simulate a click to open the .pics file dialog
+            } else {
+                alert("Invalid choice. Please select A (automatic) or B (custom import).");
+            }
+        } else {
+            console.log("No choice made. Action canceled.");
+        }
+    }
+});
+
+/*
+function triggerFileInput() {
+    // Logic to trigger file input, e.g., opening a file dialog
+    const fileInput = document.getElementById('fileInput'); // Ensure you have an input element with this ID
+    if (fileInput) {
+        fileInput.click(); // Simulate a click on the file input
+    }
+}
+*/
+// Event listener for keydown event
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === 'b') { // Check if the key is 'o' or 'O'
+        event.preventDefault(); // Prevent default action if necessary
+        triggerFileInput(); // Call the function to trigger file input
+    }
+});
+
+	
+// Event listener for keydown event
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === 'g') { // Check if the key is 'g' or 'G'
+        event.preventDefault(); // Prevent default action if necessary
+        toggleDropdown(); // Call the function to trigger file input
+    }
+});
+
+
+
+
+
+
+// Attach a keyboard shortcut (key 'm') to trigger postponing for the current vocab list
+document.addEventListener('keydown', function(event) {
+  if (event.key.toLowerCase() === 'q') {
+    const daysToPostpone = prompt("Enter the number of days to postpone:");
+
+    // Check if a valid number is entered
+    if (daysToPostpone && !isNaN(daysToPostpone)) {
+      const days = parseInt(daysToPostpone, 10);
+
+      // Postpone the dates for the current active vocabulary list only
+      postponeNPAndTimestamp(days);
+    } else {
+      alert("Invalid input. Please enter a valid number.");
+    }
+  }
+});
+
+// Function to postpone nP and corresponding timestamp for the current vocab list only
+function postponeNPAndTimestamp(days) {
+
+  // Limit the days to a range between -3 and +3
+  if (days < -3 || days > 3) {
+    alert("Please enter a value between -3 and +3.");
+    return;
+  }
+  
+  const oneDayInMs = 86400000; // 24 hours in milliseconds
+  
+  // Get the active vocab list's title
+  const activeVocabListTitle = document.getElementById('vocabListTitle').textContent;
+  
+  // Find the active vocab list
+  const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+  if (!activeVocabList) {
+    alert("No active vocabulary list found.");
+    return;
+  }
+
+  // Postpone for each word in the active vocab list
+  activeVocabList.vocabArray.forEach((word) => {
+    // Update the PrTS (practice timestamp)
+    word.PrTS += days * oneDayInMs;
+
+    // Update the nP (next presentation date)
+    const newNPDate = new Date(word.PrTS);
+    word.nP = newNPDate.toISOString().split('T')[0]; // Convert back to 'YYYY-MM-DD'
+  });
+
+  // Save the updated vocab lists back to localStorage
+  saveToLocalStorage();
+  alert(`All words in the current vocab list postponed by ${days} days.`);
+}
+
+
+	
+
+	
+
+    // Attach event listener to the toggle edit/delete button
+    const toggleButton = document.getElementById('toggle-edit-delete-btn');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', toggleEditDeleteVisibility);
+    } else {
+        console.error('Toggle edit/delete button not found in the DOM.');
+    }
+
+    // Hide the edit/delete buttons by default when the page loads
+    const tableRows = document.querySelectorAll('#vocabTable tbody tr');
+    tableRows.forEach(row => row.classList.add('hide-edit-delete'));
+
+    // Attach event listener to the Test button
+    const testButton = document.getElementById('test-btn');
+    if (testButton) {
+        testButton.addEventListener('click', function() {
+            console.log('Test button clicked');
+            selectWordsForTest();
+        });
+    } else {
+        console.error("Test button not found in the DOM");
+    }
+
+    // Attach event listener to the Exit button
+    const exitBtn = document.getElementById('exit-btn');
+    if (exitBtn) {
+        exitBtn.addEventListener('click', function() {
+            console.log('Exit button clicked');
+            resetTest();
+        });
+    } else {
+        console.error("Exit button not found in the DOM");
+    }
+	
+	
+	    // Attach event listener to the Show button
+
+    const showButton = document.getElementById('show-btn');
+    if (showButton) {
+        showButton.addEventListener('click', handleShowButtonClick);
+    } else {
+        console.error("Show button not found in the DOM");
+    }	
+	
+	
+	
+// Event listener for the OK button
+const okButton = document.getElementById('ok-btn');
+if (okButton) {
+    okButton.addEventListener('click', handleOkButtonClick);
+} else {
+    console.error("OK button not found in the DOM");
+}
+
+// Event listener for the Show Again button
+const showAgainButton = document.getElementById('show-again-btn');
+if (showAgainButton) {
+    showAgainButton.addEventListener('click', handleShowAgainButtonClick);
+} else {
+    console.error("Show Again button not found in the DOM");
+}
+	
+
+document.addEventListener('keydown', function(event) {
+    // Handle answer font size (l2 and l3)
+    if (event.key.toLowerCase() === '3') {
+        // Decrease font size for answers (l2 and l3)
+        answerPx = Math.max(10, answerPx - 2); // Decrease font size but not below 10px
+
+        // Apply the new font size to the answers currently being displayed
+        const wordDisplay = document.getElementById('word-display');
+        if (wordDisplay) {
+            const l2Element = wordDisplay.querySelector('div:nth-child(2)');
+            const l3Element = wordDisplay.querySelector('div:nth-child(3)');
+
+            if (l2Element) {
+                l2Element.style.fontSize = `${answerPx}px`; // Update l2
+            }
+            if (l3Element) {
+                l3Element.style.fontSize = `${answerPx}px`; // Update l3
+            }
+        }
+    }
+
+    if (event.key.toLowerCase() === '4') {
+        // Increase font size for answers (l2 and l3)
+        answerPx = Math.min(40, answerPx + 2); // Increase font size but not above 40px
+
+        // Apply the new font size to the answers currently being displayed
+        const wordDisplay = document.getElementById('word-display');
+        if (wordDisplay) {
+            const l2Element = wordDisplay.querySelector('div:nth-child(2)');
+            const l3Element = wordDisplay.querySelector('div:nth-child(3)');
+
+            if (l2Element) {
+                l2Element.style.fontSize = `${answerPx}px`; // Update l2
+            }
+            if (l3Element) {
+                l3Element.style.fontSize = `${answerPx}px`; // Update l3
+            }
+        }
+    }
+
+    // Handle question font size (l1)
+    if (event.key.toLowerCase() === '1') {
+        // Decrease font size for question (l1)
+        questionPx = Math.max(12, questionPx - 2); // Decrease font size but not below 12px
+
+        // Apply the new font size based on the phase
+        const wordDisplay = document.getElementById('word-display');
+        if (wordDisplay) {
+            if (isQuestionPhase) {
+                // Change font size for l1 in the question phase
+                wordDisplay.style.fontSize = `${questionPx}px`;
+            } else {
+                // Change font size for l1 in the answer phase (first div)
+                const l1Element = wordDisplay.querySelector('div:nth-child(1)');
+                if (l1Element) {
+                    l1Element.style.fontSize = `${questionPx}px`;
+                }
+            }
+        }
+    }
+
+    if (event.key.toLowerCase() === '2') {
+        // Increase font size for question (l1)
+        questionPx = Math.min(60, questionPx + 2); // Increase font size but not above 60px
+
+        // Apply the new font size based on the phase
+        const wordDisplay = document.getElementById('word-display');
+        if (wordDisplay) {
+            if (isQuestionPhase) {
+                // Change font size for l1 in the question phase
+                wordDisplay.style.fontSize = `${questionPx}px`;
+            } else {
+                // Change font size for l1 in the answer phase (first div)
+                const l1Element = wordDisplay.querySelector('div:nth-child(1)');
+                if (l1Element) {
+                    l1Element.style.fontSize = `${questionPx}px`;
+                }
+            }
+        }
+    }
+});
+
+
+
+
+// Add click event to the current language cell
+document.getElementById('currentLanguageCell').addEventListener('click', function(event) {
+    console.log('Current Language Cell clicked'); // Debugging log
+    showLanguageSelectionMenu(); // Attempt to show the language selection menu
+    event.stopPropagation(); // Prevent event from bubbling up
+});
+
+
+    document.addEventListener('keydown', function(event) {
+	
+	
+    if (event.key === 'w' || event.key === 'w') {
+        currentSortMethod = (currentSortMethod + 1) % 4; // Cycle through 0, 1, 2, 3
+        console.log(`Current sort method: ${currentSortMethod}`);
+        // Optionally, show an alert or message about the current sorting
+        switch (currentSortMethod) {
+            case 0:
+                // alert("Sorted by 't'");
+                break;
+            case 3:
+                // alert("Sorted by 'PrTS'");
+                break;
+            case 1:
+                // alert("Sorted by 'number'");
+                break;
+            case 2:
+                // alert("Sorted by 'level'");
+                break;        }
+        // Call displayVocabulary again to apply the new sort
+//        displayVocabulary(vocabArray, fileName); // Pass the current vocabArray and fileName
+        // displayVocabulary(currentVocabArray, fileName, currentSortMethod); // Pass the updated method
+		restorePreviousScreen(currentSortMethod);
+
+    }
+
+
+
+        switch(event.key) {
+            case 't': // Start test
+			            if (!isQuestionPhase) {
+                selectWordsForTest();
+				}
+                break;
+            case 's': // Show
+            case 'S': // Show
+                handleShowButtonClick();
+				                isQuestionPhase = false; // Now we're in the answer phase
+
+                break;
+            case 'd': // OK
+            case 'D': // OK
+			            if (!isQuestionPhase) {
+
+                handleOkButtonClick();
+				}
+                break;
+    case 'f': // Show Again
+    case 'F': // Show Again (uppercase)
+			            if (!isQuestionPhase) {
+
+                handleShowAgainButtonClick();
+				}
+                break;
+            case 'x': // Exit
+			
+			
+							                isQuestionPhase = false; // Now we're in the answer phase
+
+                resetTest();
+simulateClickOnToggleButton();
+                break;
+				
+				
+/*				
+            case '1': // Decrease l1 font size
+			    fontSizeCol4 = Math.max(10, fontSizeCol4 - 2); // Decrease font size, min 10px
+    updateFontSizeCol4();
+
+                break;
+            case '2': // Increase l1 font size
+    fontSizeCol4 = Math.min(40, fontSizeCol4 + 2); // Increase font size, max 40px
+    updateFontSizeCol4();
+                break;
+            case '3': // Decrease l2/l3 font size
+    fontSizeCol56 = Math.max(10, fontSizeCol56 - 2); // Decrease font size, min 10px
+    updateFontSizeCol56();
+                break;
+            case '4': // Increase l2/l3 font size
+    fontSizeCol56 = Math.min(40, fontSizeCol56 + 2); // Increase font size, max 40px
+    updateFontSizeCol56();
+                break;
+*/				
+case '5': // Decrease wordsInTest
+    if (wordsInTest > 300) {
+        wordsInTest = Math.max(3, wordsInTest - 100); // Decrease by 100 if > 300
+    } else if (wordsInTest > 100) {
+        wordsInTest = Math.max(3, wordsInTest - 50); // Decrease by 50 if > 100
+    } else if (wordsInTest > 50) {
+        wordsInTest = Math.max(3, wordsInTest - 10); // Decrease by 10 if > 50
+    } else if (wordsInTest > 20) {
+        wordsInTest = Math.max(3, wordsInTest - 5); // Decrease by 5 if > 20
+    } else {
+        wordsInTest = Math.max(3, wordsInTest - 1); // Decrease by 1 if <= 20
+    }
+    playBeep(); // Play beep sound
+	updateVocabInfoTable();
+
+    // showCenteredAlert(`Words in test: ${wordsInTest}`); // Show updated value
+    break;
+
+case '6': // Increase wordsInTest
+    if (wordsInTest >= 300) {
+        wordsInTest = Math.min(1000, wordsInTest + 100); // Increase by 100 if >= 300
+    } else if (wordsInTest >= 100) {
+        wordsInTest = Math.min(1000, wordsInTest + 50); // Increase by 50 if >= 100
+    } else if (wordsInTest >= 50) {
+        wordsInTest = Math.min(1000, wordsInTest + 10); // Increase by 10 if >= 50
+    } else if (wordsInTest >= 20) {
+        wordsInTest = Math.min(1000, wordsInTest + 5); // Increase by 5 if >= 20
+    } else {
+        wordsInTest = Math.min(1000, wordsInTest + 1); // Increase by 1 if < 20
+    }
+    playBeep(); // Play beep sound
+		updateVocabInfoTable();
+
+    // showCenteredAlert(`Words in test: ${wordsInTest}`); // Show updated value
+    break;
+
+
+case '9': // Decrease speech speed
+    if (speechSpeed <= 1) {
+        speechSpeed = Math.max(0.5, parseFloat((speechSpeed - 0.1).toFixed(1))); // Decrease by 0.1 if <= 1, but not lower than 0.5
+    } else {
+        speechSpeed = Math.max(0.5, parseFloat((speechSpeed - 0.2).toFixed(1))); // Decrease by 0.2 if > 1, but not lower than 0.5
+    }
+    playBeep(); // Play beep sound
+
+    // Update the table to reflect the new speech speed
+    updateVocabInfoTable();
+
+    // Show the updated speed with one digit after the decimal
+    // showCenteredAlert(`Speech speed: ${speechSpeed.toFixed(1)}`); // Show updated speed
+    break;
+
+
+
+case '0': // Increase speech speed
+    if (speechSpeed >= 1) {
+        speechSpeed = Math.min(1.4, parseFloat((speechSpeed + 0.2).toFixed(1))); // Increase by 0.2 if >= 1, but not greater than 1.4
+    } else {
+        speechSpeed = Math.min(1.4, parseFloat((speechSpeed + 0.1).toFixed(1))); // Increase by 0.1 if < 1, but not greater than 1.4
+    }
+    playBeep(); // Play beep sound
+
+    // Update the table to reflect the new speech speed
+    updateVocabInfoTable();
+
+    // Show the updated speed with one digit after the decimal
+    // showCenteredAlert(`Speech speed: ${speechSpeed.toFixed(1)}`); // Show updated speed
+    break;
+
+	
+	
+case '7': // Decrease maxWords
+    if (maxWords > 100) {
+        maxWords = Math.max(5, maxWords - 30); // Decrease by 30, but not lower than 3
+    } else {
+        maxWords = Math.max(5, maxWords - 1); // Decrease by 1, but not lower than 3
+    }
+    updateVocabInfoTable();
+    playBeep(); // Play beep sound
+    break;
+
+case '8': // Increase maxWords
+    if (maxWords < 100) {
+        maxWords = Math.min(400, maxWords + 1); // Increase by 1 until 100, max of 400
+    } else {
+        maxWords = Math.min(400, maxWords + 30); // Increase by 30, but not more than 400
+    }
+    updateVocabInfoTable();
+    playBeep(); // Play beep sound
+    break;
+
+case 'u': // Increase maxWords
+	maxWords=5;
+    updateVocabInfoTable();
+    playBeep(); // Play beep sound
+    break;
+	
+	
+case 'U': // Increase maxWords
+	maxWords=50;
+    updateVocabInfoTable();
+    playBeep(); // Play beep sound
+    break;
+				
+			
+			
+			
+
+
+
+			
+			
+/*
+			case 't': // Export to Browser Memory
+                playSound = true; // Trigger sound when exporting via menu
+                saveToLocalStorage(true);
+                break;
+
+
+			case 'e': // Count words due in the next two weeks
+				countWordsDueNextTwoWeeks(window.vocabArray); // Ensure vocabArray is defined
+				break;
+*/
+        }
+		
+    });
+
+
+
+
+
+		
+document.addEventListener('keypress', handleKeyPress);
+
+
+/*
+    // Array of available JPG file names
+    const imageList = [
+        'WS101.jpg', 'WS103.jpg', 'WS105.jpg',
+        'WS106.jpg', 'WS107.jpg', 'WS108.jpg', 'WS109.jpg', 'WS110.jpg',
+        'WS142.jpg', 'WS143.jpg', 'WS144.jpg',
+        'WS146.jpg', 'WS147.jpg', 'WS148.jpg', 'WS149.jpg',
+        'WS150.jpg', 'WS151.jpg', 'WS152.jpg', 'WS153.jpg', 'WS154.jpg'
+    ];
+*/
+
+
+
+// Event listener for the 'l' or 'L' key press
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'l' || event.key === 'L') {
+        // playBeep(); // Trigger the beep sound
+        showLanguageSelectionMenu(); // Open the language selection menu
+        console.log("Beep played!"); // Optional: log to console for confirmation
+    }
+});
+
+
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === '€') {
+        const activeVocabListTitle = document.getElementById('vocabListTitle').textContent; // Get the active vocab list title
+        const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+        if (activeVocabList) {
+            // Confirm before saving
+            const confirmSave = confirm('Are you sure you want to save the current vocabulary list?');
+            if (confirmSave) {
+                exportVocabularyData(activeVocabList); // Pass the active vocab list to the export function
+            } else {
+                console.log('Save action canceled.'); // Optional: Log that the save was canceled
+            }
+        } else {
+            console.error('No active vocabulary list found for export.'); // Handle error if no active list is found
+        }
+    }
+});
+
+
+
+
+
+
+
+
+
+
+// Event listener for 'c' or 'C' key to trigger the toggle
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'c' || event.key === 'C') {
+        toggleLanguageSwitch(); // Call the toggle function
+    }
+});
+
+
+
+// Event listener to handle the 'v' or 'V' key press for toggling test mode
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'v' || event.key === 'V') {
+        toggleTestMode(); // Call the function to toggle test mode
+    }
+});
+
+	
+    // Retrieve the last image used from localStorage
+    const lastImage = localStorage.getItem('lastImage');
+
+    // Filter the list to exclude the last displayed image
+    const filteredImages = imageList.filter(image => image !== lastImage);
+
+    // Randomly select a new image from the filtered list
+    const randomIndex = Math.floor(Math.random() * filteredImages.length);
+    const randomImage = filteredImages[randomIndex];
+
+    // Set the selected image as the source of the banner
+    const bannerImage = document.getElementById('random-banner');
+    bannerImage.src = `WordSirenPics/${randomImage}`;
+
+    // Save the selected image as the last image in localStorage
+    localStorage.setItem('lastImage', randomImage);
+	
+
+
+	
+});
+
+
+
+
+
+
+
+function sortVocabulary(vocabArray) {
+    const sortMethods = [
+        (a, b) => a.t - b.t,           // Sort by 't', ascending
+        (a, b) => (a.PrTS || 0) - (b.PrTS || 0), // Sort by 'PrTS', ascending
+        (a, b) => a.number - b.number  // Sort by 'number', ascending
+    ];
+
+    // Sort using the current sort method
+    vocabArray.sort(sortMethods[currentSortIndex]);
+}
+
+
+
+
+
+
+// Function to reset the variables for the currently displayed vocabulary list
+function resetVocabularyList() {
+    const activeVocabListName = document.getElementById('vocabListTitle').textContent;
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListName || list.fileName === activeVocabListName);
+
+    if (!activeVocabList) {
+        alert('No active vocabulary list found for resetting.');
+        return;
+    }
+
+    // Reset all words in the active vocabulary list
+    activeVocabList.vocabArray.forEach(word => {
+        word.w = 0; // Reset wrong count
+        word.r = 0; // Reset right count
+        word.t = 0; // Reset total attempts
+        word.lV = null; // Reset last view
+        word.inEx = false; // Reset inExamination status
+        word.round = 0; // Reset current round
+        word.level = 0; // Reset learning level
+        word.nP = null; // Reset next presentation
+        word.PrTS = null; // Reset next presentation timestamp
+        // word.image = ""; // Reset image
+        word.j1 = ""; // Reset additional field 1
+        word.j2 = ""; // Reset additional field 2
+        word.j3 = ""; // Reset additional field 3
+    });
+    displayVocabulary(activeVocabList.vocabArray, activeVocabList.fileName); // Re-render the updated list
+
+    alert('All variables have been reset to their default values for the current vocabulary list.');
+}
+
+// Function to handle keypress events
+function handleKeyPress(event) {
+    // Check if the active element is the input field or the textarea
+    const activeElement = document.activeElement;
+    const inputField = document.getElementById('answer-input'); // The ID of your input field
+    const textarea = document.getElementById('vocabInput'); // The ID of your textarea
+
+    // Only trigger the reset confirmation if neither the input field nor textarea is focused
+    if (event.key === 'z' || event.key === 'z') {
+        if (activeElement !== inputField && activeElement !== textarea) { // Check if the focused element is NOT the input field or textarea
+            const confirmFirst = confirm('Are you sure you want to reset all variables for the currently displayed vocabulary list? This action cannot be undone.');
+            if (confirmFirst) {
+                const confirmSecond = confirm('Please confirm again: Are you absolutely sure?');
+                if (confirmSecond) {
+                    resetVocabularyList(); // Call the reset function
+                }
+            }
+        }
+    }
+}
+
+// Attach the keydown event listener
+// document.addEventListener('keydown', handleKeyPress);
+
+/*
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'r') {
+        // Some action
+    }
+});
+*/
+
+
+
+// Function to simulate a click on the toggle edit/delete button
+function simulateClickOnToggleButton() {
+    // Find the button element by ID
+    const toggleButton = document.getElementById('toggle-edit-delete-btn');
+
+    // Check if the button exists before attempting to click it
+    if (toggleButton) {
+        toggleButton.click(); // Mimic the click
+    } else {
+        console.error('Toggle edit/delete button not found.');
+    }
+}
+
+// Example: Simulate click after the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // simulateClickOnToggleButton(); // This will mimic the click on page load
+});
+
+// Event listener for 'y' and 'Y' key to simulate the click
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === 'y') {
+        simulateClickOnToggleButton(); // Call the function when 'y' or 'Y' is pressed
+    }
+});
+
+			
+
+// Function to prompt for a starting image number and assign images automatically
+function assignImagesToCurrentList() {
+    // Ask the user for the starting image number
+    const startingImageNumber = prompt("Please enter the starting image number (e.g., 331 for 00331.jpg):");
+
+    // Validate the input
+    if (!startingImageNumber || isNaN(startingImageNumber) || startingImageNumber <= 0) {
+        alert("Invalid starting number. Please enter a valid number.");
+        return;
+    }
+
+    const startNumber = parseInt(startingImageNumber, 10); // Convert the input to an integer
+    
+    // Proceed with automatic image assignment logic
+    console.log(`Starting image number: ${startNumber}`);
+    
+    // Example: Call your logic to assign images starting from this number
+    autoAssignImages(startNumber); // A placeholder for your image assignment logic
+}
+
+// Placeholder function to simulate the automatic assignment process
+function autoAssignImages(startNumber) {
+    const activeVocabListTitle = document.getElementById('vocabListTitle').textContent;
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+    if (!activeVocabList) {
+        alert("No active vocabulary list found.");
+        return;
+    }
+
+    // Automatically assign images starting from the provided number
+    activeVocabList.vocabArray.forEach((vocabItem, index) => {
+        const imageNumber = startNumber + index;
+        vocabItem.image = imageNumber.toString().padStart(5, '0') + '.jpg'; // Format the image name (e.g., 00331.jpg)
+        console.log(`Assigned ${vocabItem.image} to word number ${vocabItem.number}`);
+    });
+
+    // Save the updated vocabLists to localStorage
+    saveToLocalStorage();
+
+    // Confirm to the user
+    alert('Images assigned automatically starting from ' + startNumber);
+}
+
+
+
+
+// Function to count words due in the next two weeks
+function countWordsDueNextTwoWeeks() {
+    // Get the currently active vocabulary list
+    const activeVocabListTitle = document.getElementById('vocabListTitle').textContent;
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+    // Check if the active vocab list exists
+    if (!activeVocabList) {
+        alert('No active vocabulary list found.');
+        return;
+    }
+
+    // Get the vocabArray for the active list
+    const vocabArray = activeVocabList.vocabArray;
+
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+
+    // Calculate dates for the next 13 days (including today)
+    const datesToCheck = [];
+    for (let i = -3; i < 14; i++) {
+        const futureDate = new Date(today);
+        futureDate.setDate(today.getDate() + i);
+        const futureDateFormatted = futureDate.toISOString().split('T')[0];
+        datesToCheck.push(futureDateFormatted);
+    }
+
+    // Create an object to store the count of words due on each day
+    const dueCounts = {};
+
+    // For the first date (today), count words due today or earlier
+    dueCounts[todayFormatted] = vocabArray.filter(word => word.nP <= todayFormatted).length;
+
+    // For the next dates, count only words due on that specific date
+    datesToCheck.slice(1).forEach(date => {
+        dueCounts[date] = vocabArray.filter(word => word.nP === date).length;
+    });
+
+    // Prepare the message with ordered due dates
+    let resultMessage = `Total number of words in vocabArray: ${vocabArray.length}\n\nWords due:\n`;
+    
+    // Create a string for copying to clipboard
+    let copyString = '';
+    datesToCheck.forEach(date => {
+        resultMessage += `${date}: ${dueCounts[date]} words\n`;
+        copyString += `${dueCounts[date]}\t`; // Append the counts separated by tab
+    });
+
+    // Prepare the display area for results
+    const resultsDisplay = document.getElementById('results-display');
+    const resultsText = document.getElementById('results-text');
+
+    // Clear previous results
+    resultsText.textContent = '';
+
+    // Set the results text
+    resultsText.textContent = resultMessage;
+
+    // Show the results display
+    resultsDisplay.style.display = 'block';
+
+    // Store the copy string globally for the copy function
+    window.copyString = copyString.trim(); // Trim to remove trailing tab
+}
+
+
+
+// Event listener for 'e' key to toggle results display
+document.addEventListener('keydown', function(event) {
+    const resultsDisplay = document.getElementById('results-display'); // Ensure you have the correct ID
+
+    if (event.key.toLowerCase() === 'e') { // Using toLowerCase for simplicity
+        // Check if resultsDisplay is currently visible
+        if (resultsDisplay.style.display === 'block' || resultsDisplay.style.display === '') {
+            hideResults(); // Close the results display if it's currently open
+        } else {
+            countWordsDueNextTwoWeeks(); // Call the function when e is pressed to show results
+        }
+    }
+});
+
+// Event listener for 'Escape' key to hide results display
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        hideResults(); // Call the function to hide results when Escape is pressed
+    }
+});
+
+
+
+// Function to count words by t value
+function countWordsByTValue() {
+    // Get the currently active vocabulary list
+    const activeVocabListTitle = document.getElementById('vocabListTitle').textContent;
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+    // Check if the active vocab list exists
+    if (!activeVocabList) {
+        alert('No active vocabulary list found.');
+        return;
+    }
+
+    // Get the vocabArray for the active list
+    const vocabArray = activeVocabList.vocabArray;
+
+    // Create an object to store the counts of words based on t value ranges
+    const tValueCounts = {
+        '-7': 0,
+        '-6': 0,
+        '-5': 0,
+        '-4': 0,
+        '-3': 0,
+        '-2': 0,
+        '-1': 0,
+        '0': 0,
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0,
+        '6': 0,
+        '7': 0
+    };
+
+    // Loop through the vocabArray and count words based on their t value
+    vocabArray.forEach(word => {
+        const tValue = word.t;
+
+        if (tValue <= -7) {
+            tValueCounts['-7']++; // Increment the count for -7 or less
+        } else if (tValue >= 7) {
+            tValueCounts['7']++; // Increment the count for 7 or more
+        } else {
+            // Increment the corresponding tValue count
+            tValueCounts[tValue.toString()]++;
+        }
+    });
+
+    // Prepare the display area for results
+    const resultsDisplay = document.getElementById('results-display');
+    const resultsText = document.getElementById('results-text');
+
+    // Clear previous results
+    resultsText.textContent = '';
+
+    // Prepare the message with ordered t values
+    const orderedTValues = ['-7', '-6', '-5', '-4', '-3', '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7'];
+    let resultMessage = `Total number of words in vocabArray: ${vocabArray.length}\n\nWords by t value (right minus wrong answers):\n`;
+
+    // Create a string for copying to clipboard
+    let copyString = '';
+    orderedTValues.forEach(tValue => {
+        resultMessage += `${tValue}: ${tValueCounts[tValue]} words\n`;
+        copyString += `${tValueCounts[tValue]}\t`; // Append the counts separated by tab
+    });
+
+    // Set the results text
+    resultsText.textContent = resultMessage;
+
+    // Show the results display
+    resultsDisplay.style.display = 'block';
+
+    // Store the copy string globally for the copy function
+    window.copyString = copyString.trim(); // Trim to remove trailing tab
+}
+
+// Function to copy results to clipboard
+function copyToClipboard() {
+    if (window.copyString) {
+        navigator.clipboard.writeText(window.copyString).then(() => {
+            alert('Results copied to clipboard!');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+    } else {
+        alert('No results to copy.');
+    }
+}
+
+// Function to hide results display
+function hideResults() {
+    document.getElementById('results-display').style.display = 'none';
+}
+
+// Event listener for 'r' key to toggle results display
+document.addEventListener('keydown', function(event) {
+    const resultsDisplay = document.getElementById('results-display'); // Ensure you have the correct ID
+
+    if (event.key.toLowerCase() === 'r') { // Using toLowerCase for simplicity
+        // Check if resultsDisplay is currently visible
+        if (resultsDisplay.style.display === 'block' || resultsDisplay.style.display === '') {
+            hideResults(); // Close the results display if it's currently open
+        } else {
+            countWordsByTValue(); // Call the function to show results when r is pressed
+        }
+    }
+});
+
+// Event listener for 'Escape' key to hide results display
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        hideResults(); // Call the function to hide results when Escape is pressed
+    }
+});
+
+
+
+
+/*
+// Add an event listener for keydown events
+document.addEventListener('keydown', function(event) {
+    // Check if the pressed key is 'h' or 'H'
+    if (event.key === 'r' || event.key === 'r') {
+        countWordsByTValue(); // Call the function when h/H is pressed
+    }
+});
+
+*/
+
+
+
+// Trigger the file input for importing data
+document.getElementById('import-file-btn').addEventListener('click', function() {
+    console.log("Import from File clicked"); // Debugging message
+
+    // Trigger the hidden file input
+    document.getElementById('file-input-import').click();
+
+    // Close the submenu and the main menu after clicking "Import from File"
+    closeMenus();
+});
+
+
+
+
+function updateVocabInfoTable() {
+    // Update the table cells with current values
+    // document.getElementById('vocabTitleCell').textContent = document.getElementById('vocabListTitle').textContent; // Vocab list title
+    document.getElementById('wordsInTestCell').textContent = `Words in Test: ${wordsInTest}`; // Display wordsInTest
+    document.getElementById('maxWordsCell').textContent = `Pool: ${maxWords === 400 ? 'All' : maxWords}`; // Display maxWords, show 'All' if 400
+document.getElementById('testDirection').textContent = `${isSwitched ? "L2 > L1" : "L1 > L2"}`; // Display switch
+    document.getElementById('currentLanguageCell').textContent = `Audio: ${currentLanguage}`; // Display currentLanguage
+    document.getElementById('speechSpeedCell').textContent = `Speed: ${speechSpeed}`; // Display speechSpeed
+    document.getElementById('testScore').textContent = `Score  ${rScore} : ${wScore}`; // Display speechSpeed
+// document.getElementById('inputModus').textContent = `${isInputMode ? "Write Answer" : "Self-Eval"}`; // Display input mode switch
+    document.getElementById('inputModus').textContent = isInputMode ? "Type answer" : "Self-Eval"; // Display input mode switch
+
+
+
+    // Empty cells remain empty
+}
+
+
+
+
+function exportVocabularyData(vocabList) {
+    let exportData = '';
+
+    // No header row added
+
+    vocabList.vocabArray.forEach(item => {
+        exportData += item.l1 + '\t' + item.l2 + '\t' + (item.l3 || '') + '\n';
+    });
+
+    // Create a Blob with the export data
+    const blob = new Blob([exportData], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    // Create a temporary link to trigger download
+    const a = document.createElement('a');
+    const fileName = vocabList.trueName.endsWith('.txt') 
+        ? vocabList.trueName.slice(0, -4) // Remove '.txt' if present
+        : vocabList.trueName; // Use the name as is if '.txt' is not present
+
+    a.href = url;
+    a.download = `${fileName}.txt`; // Use the trueName for the filename
+    document.body.appendChild(a);
+    a.click(); // Trigger download
+    document.body.removeChild(a); // Cleanup
+
+    URL.revokeObjectURL(url); // Free up memory
+}
+
+
+
+function showImportModal() {
+    document.getElementById('modalOverlay').style.display = 'block'; // Show the overlay
+    document.getElementById('importModal').style.display = 'flex'; // Show the modal
+
+    // Add event listener to stop propagation in the textarea
+    const textarea = document.getElementById('vocabInput');
+    textarea.addEventListener('keydown', function(event) {
+        event.stopPropagation(); // Stop all key events from propagating
+    });
+}
+
+function hideImportModal() {
+    document.getElementById('modalOverlay').style.display = 'none'; // Hide the overlay
+    document.getElementById('importModal').style.display = 'none'; // Hide the modal
+
+    // Remove the event listener when the modal is closed
+    const textarea = document.getElementById('vocabInput');
+    textarea.removeEventListener('keydown', function(event) {
+        event.stopPropagation(); // Stop all key events from propagating
+    });
+}
+/*
+
+// Function to show the import modal
+function showImportModal() {
+    // Create a modal container if it doesn't exist
+    if (!document.getElementById('importModal')) {
+        const modal = document.createElement('div');
+        modal.id = 'importModal';
+        modal.style.display = 'flex';
+        modal.style.flexDirection = 'column';
+        modal.style.alignItems = 'center';
+        modal.style.padding = '20px';
+        modal.style.border = '1px solid #ccc';
+        modal.style.backgroundColor = 'white';
+        modal.style.position = 'fixed';
+        modal.style.top = '50%';
+        modal.style.left = '50%';
+        modal.style.transform = 'translate(-50%, -50%)';
+        modal.style.zIndex = '1000';
+
+        // Title
+        const title = document.createElement('h2');
+        title.textContent = 'Import Vocabulary';
+        modal.appendChild(title);
+
+        // Radio buttons for options
+        const createNewListRadio = document.createElement('input');
+        createNewListRadio.type = 'radio';
+        createNewListRadio.name = 'importOption';
+        createNewListRadio.value = 'new';
+        createNewListRadio.id = 'createNewList';
+        createNewListRadio.checked = true; // Default to creating a new list
+
+        const createNewListLabel = document.createElement('label');
+        createNewListLabel.htmlFor = 'createNewList';
+        createNewListLabel.textContent = 'Create a new vocab list';
+
+        const appendToExistingListRadio = document.createElement('input');
+        appendToExistingListRadio.type = 'radio';
+        appendToExistingListRadio.name = 'importOption';
+        appendToExistingListRadio.value = 'append';
+        appendToExistingListRadio.id = 'appendToExistingList';
+
+        const appendToExistingListLabel = document.createElement('label');
+        appendToExistingListLabel.htmlFor = 'appendToExistingList';
+        appendToExistingListLabel.textContent = 'Add to existing vocab list';
+
+        modal.appendChild(createNewListRadio);
+        modal.appendChild(createNewListLabel);
+        modal.appendChild(appendToExistingListRadio);
+        modal.appendChild(appendToExistingListLabel);
+
+        // Textarea for vocab input
+        const vocabInput = document.createElement('textarea');
+        vocabInput.id = 'vocabInput';
+        vocabInput.placeholder = 'Enter your vocabulary data here...';
+        vocabInput.rows = 10;
+        vocabInput.cols = 30;
+        modal.appendChild(vocabInput);
+
+        // Submit button
+        const submitImport = document.createElement('button');
+        submitImport.id = 'submitImport';
+        submitImport.textContent = 'Import Vocabulary';
+        modal.appendChild(submitImport);
+
+        // Close button
+        const closeModal = document.createElement('button');
+        closeModal.textContent = 'Close';
+        closeModal.id = 'closeModal';
+        modal.appendChild(closeModal);
+
+        // Append modal to body
+        document.body.appendChild(modal);
+
+        // Event listeners
+        submitImport.addEventListener('click', handleTextareaImport);
+        closeModal.addEventListener('click', hideImportModal);
+
+        // Close modal on ESC key press
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                hideImportModal(); // Call the close function
+            }
+        });
+    }
+
+    // Show the modal
+    document.getElementById('importModal').style.display = 'flex';
+}
+
+
+// Function to hide the import modal
+function hideImportModal() {
+    document.getElementById('importModal').style.display = 'none'; // Hide the modal
+}
+*/
+
+
+// Function to handle vocabulary import from textarea
+// Function to handle vocabulary import from textarea
+function handleTextareaImport() {
+    const content = document.getElementById('vocabInput').value;
+
+    // Check if content is not empty
+    if (!content.trim()) {
+        alert('Please enter some vocabulary data.');
+        return;
+    }
+
+    const lines = content.split('\n');
+    const nonEmptyLines = lines.filter(line => line.trim() !== ''); // Filter out empty lines
+
+    // Check if the first valid line contains either TAB or #
+    if (nonEmptyLines.length > 0) {
+        const firstLine = nonEmptyLines[0];
+        if (!firstLine.includes('\t') && !firstLine.includes('#')) {
+            alert('The first valid line must contain either a TAB or #.');
+            return; // Stop the import if the condition is not met
+        }
+    } else {
+        alert('The input does not contain any valid lines.');
+        return; // Stop the import if there are no valid lines
+    }
+
+    const vocabArray = parseVocabularyFile(content); // Pass the entire content to parseVocabularyFile
+    const vocabLength = vocabArray.length;
+
+    // Loop to assign numbers and images directly to each vocab item
+    let currentNumber = 1; // Initialize a counter for numbering
+    for (let i = 0; i < vocabLength; i++) {
+        if (vocabArray[i].l1 && vocabArray[i].l2) { // Check if both l1 and l2 are present
+            vocabArray[i].number = currentNumber; // Assign the current number
+            currentNumber++; // Increment the counter for the next valid item
+
+            const imageName = String(currentNumber).padStart(5, '0') + '.jpg'; // Use currentNumber for image name
+            vocabArray[i].image = imageName; // Assign the generated image name to the "image" field of each vocab item
+        }
+    }
+
+    // Check which import option is selected
+    const selectedOption = document.querySelector('input[name="importOption"]:checked').value;
+
+    if (selectedOption === 'new') {
+        // Create a new vocabList object
+        const vocabList = {
+            fileName: 'vocab_' + Date.now().toString().slice(-5) + '.txt', // last 5 digits of timestamp
+            trueName: 'vocab_' + Date.now().toString().slice(-5),
+            listCreated: new Date().toLocaleString(),
+            lastSeen: new Date().toLocaleString(),
+            lastSeenTimestamp: Date.now(),
+            vocabArray: vocabArray
+        };
+
+        vocabLists.push(vocabList); // Add the new list to the array
+
+        displayVocabulary(vocabArray, vocabList.fileName); // Display the vocabulary of the newly added list
+    } else if (selectedOption === 'append') {
+        // Append to the currently active vocab list
+        const activeVocabListTitle = document.getElementById('vocabListTitle').textContent; // Get the active vocab list title
+        const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+        if (activeVocabList) {
+            // Assign numbers to the new items being added to the active list
+            let newNumber = activeVocabList.vocabArray.length + 1; // Start from the next available number
+
+            vocabArray.forEach(item => {
+                if (item.l1 && item.l2) { // Only add valid items
+                    item.number = newNumber++; // Assign the current number
+                    activeVocabList.vocabArray.push(item); // Append the new vocab items
+                }
+            });
+
+            displayVocabulary(activeVocabList.vocabArray, activeVocabList.fileName); // Update the display
+        } else {
+            alert("No active vocabulary list found to append to.");
+        }
+    }
+
+    // Update dropdown menu and local storage
+    displayLoadedLists(); // Show the list of loaded files
+    updateDropdownMenu(); // Update the dropdown menu with the new list
+    saveToLocalStorage(); // Save the updated vocabLists to localStorage
+
+    // Provide feedback
+    alert('Vocabulary added successfully!');
+
+    // Clear the textarea and hide the modal
+    document.getElementById('vocabInput').value = '';
+    hideImportModal();
+}
+
+
+
+
+
+
+
+
+
+
+// Event listener for the 'i' key press to show the import modal
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === '@') {
+        showImportModal(); // Show the import modal
+    }
+});
+
+// Event listener for the close button
+document.getElementById('closeModal').addEventListener('click', hideImportModal);
+
+// Event listener for the import button
+document.getElementById('submitImport').addEventListener('click', handleTextareaImport);
+
+// Close modal on ESC key press
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        hideImportModal(); // Call the close function
+    }
+});
+
+
+
+
+
+
+
+
+
+
+// asdf
+
+
+
+
+
+
+
+
+
+
+
+// Function to restore vocab lists from localStorage on page load
+function restoreVocabLists() {
+
+    // Restore vocab lists
+    const storedVocabLists = localStorage.getItem('vocabLists');
+    if (storedVocabLists) {
+        vocabLists = JSON.parse(storedVocabLists); // Restore vocab lists from localStorage
+        console.log("Vocab lists restored from localStorage:", vocabLists);
+
+        // Ensure each vocab list has a properly filled 'image' field for each vocab item
+        vocabLists.forEach(list => {
+            list.vocabArray.forEach((vocabItem, index) => {
+                if (!vocabItem.image) {
+                    const imageName = String(index + 1).padStart(5, '0') + '.jpg'; // Pad numbers with leading zeros
+                    vocabItem.image = imageName;
+                }
+            });
+        });
+
+        // Display loaded lists and update the dropdown menu
+        updateDropdownMenu();
+
+        // Find and display the vocab list with the most recent lastSeen
+        displayMostRecentVocabList();
+		
+        saveToLocalStorage(); // Save any updates to the vocab lists
+    } else {
+        console.log("No vocab lists found in localStorage.");
+    }
+
+    // Restore settings
+    const storedSettings = localStorage.getItem('settings');
+    if (storedSettings) {
+        const settings = JSON.parse(storedSettings);
+        currentLanguage = settings.currentLanguage || 'zh-CN'; // Restore or default to 'zh-CN'
+        answerPx = settings.answerPx || 20; // Restore or default to 20
+        questionPx = settings.questionPx || 28; // Restore or default to 28
+        maxRounds = settings.maxRounds || 2; // Restore or default to 2
+        wordsInTest = settings.wordsInTest || 10; // Restore or default to 10
+        maxWords = settings.maxWords || 400; // Restore or default to 400
+        speechSpeed = settings.speechSpeed || 0.7; // Restore or default to 0.7
+        isSwitched = settings.isSwitched || false; // Restore language switch state or default to false
+
+    fontSizeCol4 = settings.fontSizeCol4 !== undefined ? settings.fontSizeCol4 : 20; // Restore or default to 20
+	    fontSizeCol56 = settings.fontSizeCol56 !== undefined ? settings.fontSizeCol56 : 16; // Restore or default to 16
+    col4Width = settings.col4Width !== undefined ? settings.col4Width : 180; // Restore or default to 300
+    col3Width = settings.col3Width !== undefined ? settings.col3Width : 80; // Restore or default to 80
+
+
+        console.log("Settings restored from localStorage:", settings);
+    } else {
+        console.log("No settings found in localStorage.");
+    }
+}
+
+
+
+
+
+// Function to display the vocab list with the most recent lastSeenTimestamp
+function displayMostRecentVocabList() {
+    if (vocabLists.length === 0) return;
+
+    // Find the vocab list with the most recent lastSeenTimestamp
+    const mostRecentVocab = vocabLists.reduce((mostRecent, list) => {
+        // Handle cases where lastSeenTimestamp might be undefined
+        const listTimestamp = list.lastSeenTimestamp || 0;
+        const mostRecentTimestamp = mostRecent.lastSeenTimestamp || 0;
+
+        return listTimestamp > mostRecentTimestamp ? list : mostRecent;
+    });
+
+    // Display the vocab list
+    displayVocabulary(mostRecentVocab.vocabArray, mostRecentVocab.fileName);
+
+    // Update the <h3> with trueName or fileName
+    const vocabListTitle = document.getElementById('vocabListTitle');
+    if (vocabListTitle) {
+        vocabListTitle.textContent = `${mostRecentVocab.trueName || mostRecentVocab.fileName}`;
+    } else {
+        console.error('vocabListTitle element not found');
+    }
+}
+
+
+
+
+
+// Function to play a beep sound
+function playBeep() {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); // Create an audio context
+
+    const oscillator = audioCtx.createOscillator(); // Create an oscillator (sound wave generator)
+    const gainNode = audioCtx.createGain(); // Create a gain node to control the volume
+
+    oscillator.connect(gainNode); // Connect oscillator to the gain node
+    gainNode.connect(audioCtx.destination); // Connect gain node to the audio context destination (speakers)
+
+    oscillator.frequency.value = 800; // Frequency in hertz (800Hz for a softer beep)
+    gainNode.gain.value = 0.01; // Lower volume for a softer sound
+
+    oscillator.start(); // Start the sound
+    oscillator.stop(audioCtx.currentTime + 0.2); // Stop after 0.2 seconds for a slightly longer beep
+}
+
+
+
+
+function saveToLocalStorage(playSound = false) {
+    // Filter out any vocab lists that have an empty vocabArray
+    const filteredVocabLists = vocabLists.filter(list => list.vocabArray.length > 0);
+
+    // Save vocab lists
+    const vocabListsString = JSON.stringify(filteredVocabLists);
+    localStorage.setItem('vocabLists', vocabListsString);
+
+    // Save other variables
+    const settings = {
+        currentLanguage,
+        answerPx,
+        questionPx,
+        maxRounds,
+        wordsInTest,
+		maxWords,
+        speechSpeed,
+		fontSizeCol4,
+		fontSizeCol56,
+		col4Width,
+		col3Width,		
+        isSwitched, // Save the language switch state
+    };
+    localStorage.setItem('settings', JSON.stringify(settings));
+
+    console.log("Vocabulary lists and settings saved to Browser Memory (localStorage).");
+
+    // Play the beep sound if playSound is true
+    if (playSound) {
+        playBeep(); // Play the beep only when saving via the menu
+    }
+
+    closeMenus(); // Optional: close menus after saving
+}
+
+
+
+    // Function to export vocabLists from localStorage to a text file
+function exportToFile() {
+    // First, save the data to localStorage
+    saveToLocalStorage();
+
+    // Retrieve the vocab lists and settings from localStorage
+    const vocabListsString = localStorage.getItem('vocabLists');
+    const settingsString = localStorage.getItem('settings');
+    
+    if (!vocabListsString || !settingsString) {
+        alert('No data found in Browser Memory (localStorage).');
+        return;
+    }
+
+    // Parse the vocab lists and settings from JSON to add the settings to the export file
+    const vocabLists = JSON.parse(vocabListsString);
+    const settings = JSON.parse(settingsString);
+
+    // Combine the settings into a single object for export
+    const exportData = {
+        vocabLists: vocabLists,
+        settings: settings
+    };
+
+    // Create a JSON string from the combined data, but without pretty printing (one line)
+    const exportString = JSON.stringify(exportData);
+
+    // Create a Blob from the JSON string
+    const blob = new Blob([exportString], { type: 'text/plain' });
+
+    // Create a link element for file download
+    const link = document.createElement('a');
+    
+    // Get the current date and time for a dynamic filename
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+    // Generate a timestamp in the format YYYYMMDD_HHMM
+    const timestamp = `${year}${month}${day}_${hours}${minutes}`;
+
+    // Set the download attribute with the dynamic timestamp
+    link.download = `WordSiren_${timestamp}.txt`;
+    
+    // Create a URL for the Blob and set it as the href attribute
+    link.href = window.URL.createObjectURL(blob);
+    
+    // Append the link to the body (it needs to be in the DOM to work)
+    document.body.appendChild(link);
+    
+    // Programmatically click the link to trigger the download
+    link.click();
+    
+    // Remove the link from the document after the download is triggered
+    document.body.removeChild(link);
+
+    // Close the menus after action
+    closeMenus();
+}
+
+
+    // Function to close both the main menu and submenu
+    function closeMenus() {
+        // Hide the main menu
+        document.querySelector('.menu').style.display = 'none';
+        // Hide the submenu
+        document.querySelector('.submenu').style.display = 'none';
+    }
+
+    // Attach the event listeners to the menu items
+document.querySelector('.submenu-item:nth-child(1)').addEventListener('click', function() {
+    saveToLocalStorage(true); // Pass true to play the beep sound
+});    // document.querySelector('.submenu-item:nth-child(3)').addEventListener('click', exportToFile); // Export to File
+	// asdf line above causes double save window.
+	
+	
+    // You can add other functions for Import from Browser Memory and Import from File later, just make sure to call closeMenus()
+
+console.log('Size of vocabLists data in bytes: ', new Blob([localStorage.getItem('vocabLists')]).size);
+
+
+	
+
+// Handle the file input change event to process the file
+document.getElementById('file-input-import').addEventListener('change', function(event) {
+    const file = event.target.files[0]; // Get the selected file
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const content = e.target.result;
+
+            try {
+                // Parse the imported file content as JSON
+                const importedVocabLists = JSON.parse(content);
+
+                // Confirm before importing data
+                if (confirm('Are you sure you want to import this file and potentially overwrite existing vocab lists?')) {
+                    importVocabLists(importedVocabLists); // Call function to import the lists
+                }
+            } catch (error) {
+                alert('Error: The file could not be imported. Please make sure it is a valid WordSiren export file.');
+                console.error('Import error:', error);
+            }
+        };
+
+        reader.readAsText(file); // Read the file as text
+    }
+});
+
+/*		
+document.getElementById('import-file-btn').addEventListener('click', function() {
+    console.log("Import from File clicked"); // Debugging message
+    document.getElementById('file-input-import').click();
+});
+*/	
+		
+
+ function parseVocabularyFile(content) {
+    const lines = content.split('\n'); // Split content into lines
+    const vocabArray = [];
+
+    lines.forEach((line, index) => {
+        if (line.trim()) { // Ensure the line isn't empty
+            const columns = line.split(/[\t#]/); // Use regex to split by TAB or #
+
+
+            const l1 = columns[0] ? columns[0].trim() : ''; // First column: language1
+            const l2 = columns[1] ? columns[1].trim() : ''; // Second column: language2
+            const l3 = columns[2] ? columns[2].trim() : ''; // Third column: language3 (optional), add empty string if missing
+
+            // Create an object for each vocabulary item, including additional fields
+            const vocabItem = {
+                number: index + 1, // Auto-increase number
+                l1: l1, // First language word
+                l2: l2, // Second language word or phonetic notation
+                l3: l3 || '', // If the third column doesn't exist, set to empty string
+                
+                // Additional fields for progress tracking (shortened)
+                w: 0, // wrong (track how many times the user got this word wrong)
+                r: 0, // right (track how many times the user got this word right)
+                t: 0, // total (right + wrong)
+                lV: null, // lastView (date and time of the last view)
+                inEx: false, // inExamination (whether the word is currently being examined)
+                round: 0, // current round
+                level: 0, // learning level (renamed from 'l' to 'level')
+                nP: null, // nextPresentation (for spaced repetition)
+                PrTS: null, // nextPresentationTimestamp (new field for timestamp)
+				image: "",
+				j1: "",
+				j2: "",
+				j3: ""
+
+            };
+
+            vocabArray.push(vocabItem); // Add vocab item to the array
+        }
+    });
+
+    return vocabArray; // Return the array of vocabulary items
+}
+
+
+
+
+        function displayLoadedLists() {
+            const loadedListsElement = document.querySelector('#loadedLists');
+            loadedListsElement.innerHTML = ''; // Clear the existing list
+        }
+
+// Function to show or hide the dropdown menu
+function toggleDropdown() {
+    const dropdown = document.getElementById('dropdown');
+    dropdown.style.display = dropdown.style.display === 'none' || dropdown.style.display === '' ? 'block' : 'none';
+}
+
+// Event listener for the ESC key to hide the dropdown menu
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const dropdown = document.getElementById('dropdown');
+        dropdown.style.display = 'none'; // Hide the dropdown menu
+    }
+});
+
+
+        // Function to update the dropdown menu when new lists are added
+
+// Function to update the dropdown menu with the loaded lists, sorted by trueName (descending)
+function updateDropdownMenu() {
+    const dropdown = document.getElementById('dropdown');
+    dropdown.innerHTML = ''; // Clear existing items
+// maxWords=1000;
+/*
+    // Sort vocab lists by trueName (or fileName if trueName is not set) in descending order
+    const sortedVocabLists = [...vocabLists].sort((a, b) => {
+        const nameA = (a.trueName || a.fileName).toLowerCase(); // Convert to lowercase for case-insensitive comparison
+        const nameB = (b.trueName || b.fileName).toLowerCase();
+        return nameB.localeCompare(nameA); // Sort in descending order
+    });
+
+    // Sort vocab lists by lastSeenTimestamp in descending order
+    const sortedVocabLists = [...vocabLists].sort((a, b) => {
+        return (b.lastSeenTimestamp || 0) - (a.lastSeenTimestamp || 0); // Sort by descending timestamps
+    });
+*/	
+
+
+// Sort vocab lists by trueName (or fileName if trueName is not set) in ascending order
+const sortedVocabLists = [...vocabLists].sort((a, b) => {
+    const nameA = (a.trueName || a.fileName).toLowerCase(); // Convert to lowercase for case-insensitive comparison
+    const nameB = (b.trueName || b.fileName).toLowerCase();
+    return nameA.localeCompare(nameB); // Sort in ascending order
+});
+
+	
+
+    // Create menu items from the sorted vocab lists
+    sortedVocabLists.forEach((list, index) => {
+        const listItem = document.createElement('div');
+        listItem.classList.add('dropdown-item-container'); // Add a container for the list, edit, and remove buttons
+
+        const listLink = document.createElement('a');
+        listLink.textContent = `${index + 1}: ${list.trueName || list.fileName} `;
+		// (LS: ${list.lastSeen || 'Never'} )
+        listLink.href = "#"; // Make it clickable
+        listLink.classList.add('dropdown-item');
+        listLink.setAttribute('data-file-name', list.fileName); // Store the file name as a data attribute
+
+        // Add click event listener to display vocab list when clicked
+        listLink.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default link behavior
+maxWords=400;
+
+            // Display the selected vocab list and update lastSeen
+			displayVocabulary(list.vocabArray, list.fileName);
+            toggleDropdown(); // Close the dropdown after selecting
+			simulateClickOnToggleButton();
+        });
+
+        // Create a "Remove" button for each list
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'X'; // This can be a small "X" for simplicity
+        removeButton.classList.add('remove-btn'); // Add a class for styling
+        removeButton.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent triggering the click event for the list itself
+
+            // Show a confirmation prompt before removing the list
+            if (confirm(`Are you sure you want to delete ${list.fileName}?`)) {
+                removeVocabList(vocabLists.indexOf(list)); // Remove by original index
+            }
+        });
+
+        // Create an "Edit" button for each list to edit trueName
+        const editButton = document.createElement('button');
+        editButton.textContent = '✎'; // Pencil icon for edit
+        editButton.classList.add('edit-btn'); // Add a class for styling
+        editButton.addEventListener('click', function(event) {
+            event.stopPropagation(); // Prevent triggering the click event for the list itself
+
+            // Prompt the user to edit the trueName
+            const newTrueName = prompt('Edit trueName:', list.trueName || list.fileName);
+            if (newTrueName !== null && newTrueName.trim() !== '') {
+                list.trueName = newTrueName.trim(); // Update the trueName
+                updateDropdownMenu(); // Refresh the dropdown to show the updated name
+                saveToLocalStorage(); // Save the updated list to localStorage
+            }
+        });
+
+        // Append the list item, edit button, and remove button to the dropdown
+        listItem.appendChild(listLink);
+        listItem.appendChild(editButton); // Add edit button
+        listItem.appendChild(removeButton); // Add remove button
+        dropdown.appendChild(listItem); // Append the item to the dropdown
+    });
+}
+
+
+
+
+
+		
+// Function to toggle the visibility of the menu
+function toggleHamburgerMenu() {
+    const menu = document.querySelector('.menu');
+    // Toggle the menu visibility
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none'; // Hide the menu
+    } else {
+        menu.style.display = 'block'; // Show the menu
+    }
+}
+
+// Attach the event listener to the hamburger button
+document.getElementById('hamburger-btn').addEventListener('click', toggleHamburgerMenu);
+
+// Event listener for closing the menu with the Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const menu = document.querySelector('.menu');
+        if (menu.style.display === 'block') {
+            menu.style.display = 'none'; // Hide the menu
+        }
+    }
+});
+
+
+        // Function to show the Export/Import submenu
+        function showExportImportMenu() {
+            const submenu = document.getElementById('export-import-submenu');
+            // Toggle the submenu visibility
+            submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Attach the event listener to the hamburger button
+        document.getElementById('hamburger-btn').addEventListener('click', toggleHamburgerMenu);
+
+
+
+function removeVocabList(index) {
+    if (index > -1 && index < vocabLists.length) {
+        // Remove the vocab list from the array
+        const removedList = vocabLists.splice(index, 1);
+
+        // Update localStorage with the new vocab list array
+        saveToLocalStorage();
+
+        // Update the dropdown menu and the list of loaded vocab files
+        displayLoadedLists();
+        updateDropdownMenu();
+
+        console.log(`Removed: ${removedList[0].fileName}`);
+    }
+}
+
+if (confirm(`Are you sure you want to delete ${vocabLists[index].fileName}?`)) {
+    removeVocabList(index);
+}
+		
+		
+		
+
+
+/*
+document.getElementById('import-file-btn').addEventListener('click', function() {
+    // Trigger the hidden file input for importing
+    document.getElementById('file-input-import').click();
+});
+*/
+
+document.getElementById('file-input-import').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            const content = e.target.result;
+
+            try {
+                // Parse the imported file content as JSON
+                const importedVocabLists = JSON.parse(content);
+
+                // Confirm before importing data
+                if (confirm('Are you sure you want to import this file and potentially overwrite existing vocab lists?')) {
+                    importVocabLists(importedVocabLists);
+                }
+            } catch (error) {
+                alert('Error: The file could not be imported. Please make sure it is a valid WordSiren export file.');
+                console.error('Import error:', error);
+            }
+        };
+
+        reader.readAsText(file);
+    }
+});
+
+
+
+
+function importVocabLists(importedData) {
+    const importedVocabLists = importedData.vocabLists || [];
+    const importedSettings = importedData.settings || {};
+
+    let existingVocabLists = JSON.parse(localStorage.getItem('vocabLists')) || [];
+
+    importedVocabLists.forEach(importedList => {
+        const existingIndex = existingVocabLists.findIndex(list => list.fileName === importedList.fileName);
+
+        if (existingIndex > -1) {
+            // Overwrite the existing list with the same fileName
+            existingVocabLists[existingIndex] = importedList;
+            console.log(`Overwritten list: ${importedList.fileName}`);
+        } else {
+            // Add the new vocab list if no matching fileName is found
+            existingVocabLists.push(importedList);
+            console.log(`Added new list: ${importedList.fileName}`);
+        }
+
+        // Ensure lastSeenTimestamp is set correctly, fallback to the current time if missing
+        if (!importedList.lastSeenTimestamp) {
+            importedList.lastSeenTimestamp = Date.now();
+            importedList.lastSeen = new Date().toLocaleString();  // Also set lastSeen
+        }
+    });
+
+    // Save the updated vocab lists to localStorage
+    localStorage.setItem('vocabLists', JSON.stringify(existingVocabLists));
+
+    // Handle settings import
+    if (Object.keys(importedSettings).length > 0) {
+        localStorage.setItem('settings', JSON.stringify(importedSettings));
+        console.log('Imported settings:', importedSettings);
+    }
+
+    // Update the UI after import
+    vocabLists = existingVocabLists;
+    displayLoadedLists();
+    updateDropdownMenu();
+
+    // Display the most recently accessed vocab list
+    displayMostRecentVocabList();  // This should now work
+
+    alert('Vocab lists and settings successfully imported.');
+}
+
+		
+
+
+
+
+
+function toggleEditDeleteVisibility() {
+    const tableRows = document.querySelectorAll('#vocabTable tbody tr'); // Select all rows within tbody
+
+    if (tableRows.length === 0) {
+        console.error('No table rows found!');
+        return;
+    }
+
+    tableRows.forEach(row => {
+        if (row.classList.contains('hide-edit-delete')) {
+            row.classList.remove('hide-edit-delete');
+            row.classList.add('show-edit-delete');
+            console.log('Column 2 shown');
+        } else {
+            row.classList.remove('show-edit-delete');
+            row.classList.add('hide-edit-delete');
+            console.log('Column 2 hidden');
+        }
+    });
+}
+
+
+
+
+
+
+
+
+function getColorForTValue(t) {
+    if (t <= -6) {
+        return 'rgba(255, 153, 153, 0.5)'; // Very light red for -6 or lower
+    } else if (t >= 6) {
+        return 'rgba(255, 179, 255, 0.5)'; // Very light magenta for 6 or higher
+    }
+
+    switch (t) {
+        case -5: return 'rgba(255, 204, 153, 0.5)'; // Very light orange-red
+        case -4: return 'rgba(255, 217, 179, 0.5)'; // Very light orange
+        case -3: return 'rgba(255, 238, 153, 0.5)'; // Very light yellow
+        case -2: return 'rgba(230, 255, 204, 0.5)'; // Very light lime green
+        case -1: return 'rgba(204, 255, 204, 0.5)'; // Very light green
+        case  0: return 'rgba(204, 255, 255, 0.5)'; // Very light cyan
+        case  1: return 'rgba(204, 229, 255, 0.5)'; // Very light sky blue
+        case  2: return 'rgba(204, 204, 255, 0.5)'; // Very light blue
+        case  3: return 'rgba(230, 204, 255, 0.5)'; // Very light lavender
+        case  4: return 'rgba(255, 204, 255, 0.5)'; // Very light pink
+        case  5: return 'rgba(255, 153, 255, 0.5)'; // Very light violet
+        default: return 'rgba(255, 255, 255, 1)';    // Default white
+    }
+}
+
+		
+		
+// Function to display the vocabulary list and update lastSeen
+// function displayVocabulary(vocabArray, fileName) {
+function displayVocabulary(vocabArray, fileName, currentSortMethod = 0) {
+	    // alert(`Displaying vocabulary for file: ${fileName} with sort method: ${currentSortMethod}`);
+	updateVocabInfoTable(); // Call this to update the table
+    isQuestionPhase = false; // Now we're in the answer phase
+	// col4Width = 180;
+	
+	
+
+    const tableBody = document.querySelector('#vocabTable tbody');
+    tableBody.innerHTML = ''; // Clear any previous content
+	
+
+    // Find the corresponding vocab list by fileName and update lastSeen and lastSeenTimestamp
+    const vocabList = vocabLists.find(list => list.fileName === fileName);
+    if (vocabList) {
+        const currentTime = new Date();
+        vocabList.lastSeen = currentTime.toLocaleString(); // Human-readable format
+        vocabList.lastSeenTimestamp = currentTime.getTime(); // Numeric timestamp
+
+        console.log(`Updated lastSeen for ${vocabList.fileName} to ${vocabList.lastSeen}`);
+        console.log(`Updated lastSeenTimestamp for ${vocabList.fileName} to ${vocabList.lastSeenTimestamp}`);
+
+        // Update the <h3> with trueName or fileName
+        const vocabListTitle = document.getElementById('vocabListTitle');
+        if (vocabListTitle) {
+            vocabListTitle.textContent = `${vocabList.trueName || vocabList.fileName}`;
+        } else {
+            console.error('vocabListTitle element not found');
+        }
+
+        // After updating lastSeen, refresh the dropdown to reflect the change
+        updateDropdownMenu();
+        saveToLocalStorage(); // Save the updated vocabLists to localStorage
+    }
+
+    // Sort vocabArray by 't' in ascending order
+    // vocabArray.sort((a, b) => a.t - b.t); // Sort by 't', ascending
+	// vocabArray.sort((a, b) => a.number - b.number); // Sort by 't', ascending
+		//  vocabArray.sort((a, b) => a.PrTS - b.PrTS); // Sort by 't', ascending
+
+
+    // Sort vocabArray based on current sorting method
+    console.log(`Current sort method: ${currentSortMethod}`); // Debug line
+	// alert(`Current sort method before switch: ${currentSortMethod}`);
+	    // alert(`Displaying vocabulary for file: ${fileName} with sort method: ${currentSortMethod}`);
+
+
+    switch (currentSortMethod) {
+        case 0:
+            vocabArray.sort((a, b) => a.t - b.t); // Sort by 't'
+            break;
+        case 3:
+            vocabArray.sort((a, b) => a.PrTS - b.PrTS); // Sort by 'PrTS'
+            // alert("Sorted by xxxxxxxxxxxxxxx 'PrTS'"); // Should appear
+            break;
+        case 1:
+            vocabArray.sort((a, b) => a.number - b.number); // Sort by 'number'
+			            // alert("Sorted by dddddddddd 'Number'"); // Should appear
+
+            break;
+        case 2:
+            vocabArray.sort((a, b) => a.level - b.level); // Sort by 'level'
+			            // alert("Sorted by dddddddddd 'Number'"); // Should appear
+
+            break;
+    }
+
+
+
+	// sortVocabulary(vocabArray); // Sort the vocabArray based on the current sorting method
+
+
+    // Display the vocabulary list in the table
+    vocabArray.forEach((item, index) => {
+        // Create a new row for each vocab item
+        const row = document.createElement('tr');
+
+        // Create the first cell with the number (#)
+        const numberCell = document.createElement('td');
+        numberCell.textContent = item.number; // Use the actual "number" field from the word object
+
+        // Set background color based on 't' only for the first column
+        numberCell.style.backgroundColor = getColorForTValue(item.t);
+
+        row.appendChild(numberCell);
+
+        // Create an "Edit" button for each entry
+        const editButton = document.createElement('button');
+        editButton.textContent = '✎'; // Pencil icon for edit
+        editButton.classList.add('edit-btn');
+        editButton.addEventListener('click', function () {
+            // Open prompt for editing
+            openEditPrompt(item, index, fileName);
+        });
+
+        // Create a "Delete" button for each entry
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'X'; // X symbol for delete
+        deleteButton.classList.add('delete-btn');
+        deleteButton.addEventListener('click', function () {
+            if (confirm(`Are you sure you want to delete entry ${item.l1}?`)) {
+                vocabArray.splice(index, 1); // Remove the item from the vocabArray
+                // Renumber the remaining items
+                vocabArray.forEach((entry, i) => entry.number = i + 1);
+
+                // Save the updated list and re-render
+                saveToLocalStorage();
+                displayVocabulary(vocabArray, fileName); // Re-render the updated list
+            }
+        });
+
+        // Add the buttons to the action cell
+        const actionCell = document.createElement('td');
+        actionCell.classList.add('action-cell'); // Apply the CSS class for the action cell
+        actionCell.appendChild(editButton);
+        actionCell.appendChild(deleteButton);
+		
+		
+
+    // Create a text node for the t value
+    const tValueNode = document.createTextNode(` (T/L: ${item.t}/${item.level})`); // Format as needed
+    actionCell.appendChild(tValueNode); // Append the t value node to the action cell
+
+    // Add the action cell to the row
+    row.appendChild(actionCell);
+
+
+	
+
+        // Add the action cell to the row
+        row.appendChild(actionCell);
+
+        // Create a new column for the Pronounce, Google Translate, and Pleco buttons (to be placed BEFORE l1)
+        const buttonsCell = document.createElement('td');
+
+        // Google Translate sound link button (G)
+        const soundButton = document.createElement('a');
+        soundButton.href = `https://translate.google.com/?sl=auto&text=${encodeURIComponent(item.l1)}&op=translate`;
+        soundButton.target = '_blank';
+        soundButton.classList.add('sound-button');
+        soundButton.textContent = 'G'; // Google Translate icon
+
+        // Pleco button (P)
+        const plecoForm = document.createElement('form');
+        plecoForm.action = `plecoapi://x-callback-url/s`;
+        plecoForm.method = 'get';
+        plecoForm.classList.add('inline-form');
+
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'q';
+        hiddenInput.value = item.l1;
+
+        const plecoButton = document.createElement('input');
+        plecoButton.type = 'submit';
+        plecoButton.value = 'P';
+        plecoButton.classList.add('pleco-button');
+
+/*
+        plecoForm.appendChild(hiddenInput);
+        plecoForm.appendChild(plecoButton);
+*/
+        // Pronounce button
+        const pronounceButton = document.createElement('button');
+        pronounceButton.textContent = '🔊'; // Set the text to the sound icon
+        pronounceButton.classList.add('pronounce-button'); // Apply the smaller button style using the 'pronounce-button' class
+        pronounceButton.addEventListener('click', function () {
+            const utterance = new SpeechSynthesisUtterance(item.l1);
+            utterance.lang = currentLanguage; // Set the language for Chinese
+			utterance.rate = speechSpeed;
+            speechSynthesis.speak(utterance); // Speak the word
+        });
+
+        // Append the Google Translate (G), Pleco (P), and Pronounce (🔊) buttons in the same order
+        buttonsCell.appendChild(soundButton); // Google sound link button
+        buttonsCell.appendChild(plecoForm);   // Pleco button
+        buttonsCell.appendChild(pronounceButton); // Pronounce button
+        row.appendChild(buttonsCell); // Append the new column before l1
+
+        // Create cells for language1, language2, language3
+        const language1Cell = document.createElement('td');
+
+        // Add click event to l1 field to open image in a modal
+		/*
+        language1Cell.addEventListener('click', function () {
+            openImageModal(item); // Call the function to open modal with the image
+        });
+		*/
+		language1Cell.addEventListener('click', function () {
+			openImageModal(vocabArray, index); // Pass the vocabArray and the current index
+		});
+
+		
+
+        // Append the text to the l1 cell (Chinese word or item)
+        language1Cell.appendChild(document.createTextNode(item.l1));
+        row.appendChild(language1Cell);
+		
+		fontSizeCol4 = Math.max(10, fontSizeCol4); // Decrease font size, min 10px
+updateFontSizeCol4();
+
+        const language2Cell = document.createElement('td');
+        language2Cell.textContent = item.l2;
+
+        const language3Cell = document.createElement('td');
+        language3Cell.textContent = item.l3;
+		
+				fontSizeCol56 = Math.max(10, fontSizeCol56); // Decrease font size, min 10px
+updateFontSizeCol56();
+
+        // Append the cells to the row in the correct order
+        row.appendChild(language2Cell);
+        row.appendChild(language3Cell);
+
+        // Append the row to the table
+        tableBody.appendChild(row);
+    });
+}
+
+
+
+
+
+
+function hideOpenImageModal() {
+    const imageModal = document.getElementById('imageModal'); // Assuming your modal has this ID
+    if (imageModal && imageModal.style.display === 'block') {
+        imageModal.style.display = 'none'; // Hide the modal if it's currently open
+    }
+}
+
+// Function to open the image in a modal window and pronounce l1
+function openImageModal(vocabArray, wordIndex) {
+
+    const header = document.querySelector('.header-container');
+    if (header) {
+        header.style.display = 'none'; // Hide the header
+    }
+
+
+
+    currentIndex = wordIndex; // Set the current word index
+
+
+
+// Function to update modal content
+function updateModalContent(word) {
+
+    // Get the active vocab list
+    const activeVocabListTitle = document.getElementById('vocabListTitle').textContent;
+	let drv = String.fromCharCode(drive.charCodeAt(0) + 5);
+
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+    // Extract vocabArray from the active vocab list
+    const vocabArray = activeVocabList.vocabArray;
+
+    // Find the index of the current word
+    const index = vocabArray.indexOf(word);
+
+    // Check if the word exists in the vocabArray
+    if (index === -1) {
+        alert('Word not found in the current vocabulary list.');
+        return;
+    }
+
+    // Update the modal content
+    l1Text.textContent = word.l1;
+    l2Text.textContent = word.l2;
+    l3Text.textContent = word.l3 || ''; // Handle empty l3
+
+
+    // New line: Display level, total, right, and wrong answers
+    resultsText.textContent = `Level: ${word.level}   |   Total: ${word.t}   |   Right: ${word.r}   |   Wrong: ${word.w}`;
+
+
+
+    // Fetch the image file name directly from the word object
+    const imageFileName = word.image; // Get the image from the word object
+
+    const wordNumber = word.number.toString().padStart(5, '0'); // Zero-pad the number
+    
+
+const activeVocabListName = document.getElementById('vocabListTitle').textContent; 
+const vocabList = vocabLists.find(list => list.trueName === activeVocabListName || list.fileName === activeVocabListName);
+if (vocabList.trueName.startsWith("DW_")) {
+    image.src = `file:///${drv}:/%20WS/${imageFileName}`; 
+} else {
+    image.src = `wspics/${imageFileName}`;
+}
+/*
+	image.src = `wspics/${imageFileName}`;
+	image.src = `q:/%20WS/${imageFileName}`;#
+*/
+    image.alt = `Image for word ${word.number}`; // Update alt text based on word number
+
+    // Debugging: Display the image source for troubleshooting
+    // showCustomAlert(`Image source: ${image.src}`);
+
+    setTimeout(function() {
+        speakChinese(word.l1);
+    }, 1500); // 1000ms = 1 second
+}
+
+
+    // Create modal structure
+const modal = document.createElement('div');
+modal.id = 'imageModal';
+modal.style.position = 'fixed';
+modal.style.top = '45px';
+modal.style.right = '0'; // Position the modal to the right
+modal.style.width = '60%'; // Adjust width to fit on the right side
+modal.style.height = '100%'; // Full height of the screen
+modal.style.backgroundColor = 'rgba(255,255,255,0.99)';
+modal.style.display = 'flex';
+modal.style.flexDirection = 'column'; // Stack elements vertically
+modal.style.justifyContent = 'flex-start'; // Align content at the top
+modal.style.alignItems = 'center'; // Center content horizontally
+modal.style.zIndex = '1000';
+
+    // Create the l1, l2, l3, and results text elements
+    const l1Text = document.createElement('div');
+    l1Text.style.fontSize = '30px';
+    l1Text.style.color = '#444444';
+    l1Text.style.textAlign = 'center';
+    l1Text.style.marginBottom = '10px';
+
+    const l2Text = document.createElement('div');
+    l2Text.style.fontSize = '22px';
+    l2Text.style.color = '#444444';
+    l2Text.style.textAlign = 'center';
+    l2Text.style.marginBottom = '10px';
+
+    const l3Text = document.createElement('div');
+    l3Text.style.fontSize = '16px';
+    l3Text.style.color = '#444444';
+    l3Text.style.textAlign = 'center';
+    l3Text.style.marginBottom = '10px';
+
+    // New element: results text (level, total, right, wrong)
+    const resultsText = document.createElement('div');
+    resultsText.style.fontSize = '14px';
+    resultsText.style.color = '#333333';
+    resultsText.style.textAlign = 'center';
+    resultsText.style.marginBottom = '15px';
+
+    // Create image element
+    const image = document.createElement('img');
+    image.style.maxWidth = '90%';
+    image.style.maxHeight = '90%';
+
+    // Append elements to the modal
+    modal.appendChild(l1Text);
+    modal.appendChild(l2Text);
+    modal.appendChild(l3Text);
+    modal.appendChild(resultsText); // Append the results text
+    modal.appendChild(image);
+    document.body.appendChild(modal);
+
+
+    // Function to close modal and remove listeners
+    function closeModal() {
+	
+    const header = document.querySelector('.header-container');
+    if (header) {
+        header.style.display = 'block'; // Show the header again
+    }
+        modal.remove(); // Remove the modal from the DOM
+        document.removeEventListener('keydown', escKeyListener); // Remove ESC listener
+        document.removeEventListener('keydown', arrowKeyListener); // Remove arrow key listener
+    }
+
+    // Add event listener for ESC key to close the modal
+    function escKeyListener(event) {
+        if (event.key === 'Escape') {
+            closeModal(); // Call the close function
+        }
+    }
+    document.addEventListener('keydown', escKeyListener);
+
+    // Event listener for left and right arrow keys to navigate
+    function arrowKeyListener(event) {
+        if (event.key === 'ArrowRight') {
+            if (currentIndex < vocabArray.length - 1) {
+                currentIndex += 1;
+                updateModalContent(vocabArray[currentIndex]);
+            }
+        } else if (event.key === 'ArrowLeft') {
+            if (currentIndex > 0) {
+                currentIndex -= 1;
+                updateModalContent(vocabArray[currentIndex]);
+            }
+        }
+    }
+    document.addEventListener('keydown', arrowKeyListener);
+
+    // Close the modal when clicking anywhere outside the image
+    modal.addEventListener('click', closeModal);
+
+    // Initialize the modal with the selected word
+    updateModalContent(vocabArray[wordIndex]);
+}
+
+
+
+// Pronunciation function
+function speakChinese(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = currentLanguage; // Set the language for Mandarin Chinese
+    utterance.rate = speechSpeed; // Adjust speed to 70%
+    speechSynthesis.speak(utterance); // Play the speech
+}
+
+
+
+
+
+
+
+
+function showCustomAlert(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.textContent = message;
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '10px';
+    alertDiv.style.left = '10px';
+    alertDiv.style.backgroundColor = 'rgba(255,255,255,0.8)';
+    alertDiv.style.padding = '10px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.border = '1px solid #ccc';
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.remove(); // Automatically remove the alert after 3 seconds
+    }, 3000);
+}
+
+
+
+
+
+
+// Function to handle .pics file import
+function handlePicsFileImport(event) {
+    const file = event.target.files[0]; // Get the selected file
+    
+    if (!file) {
+        alert('No file selected.');
+        return;
+    }
+
+    const reader = new FileReader();
+    
+    reader.onload = function(e) {
+        const content = e.target.result; // File content as a string
+        const imageList = content.trim().split('\n').map(line => line.replace('\r', '')); // Remove \r from each line
+        
+        // Ensure that we have a valid active vocab list
+        const activeVocabListTitle = document.getElementById('vocabListTitle').textContent;
+        const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+        if (!activeVocabList) {
+            alert('No active vocabulary list found.');
+            return;
+        }
+
+        // Map image filenames to the correct vocab items based on word.number
+        imageList.forEach((imageFileName, index) => {
+            const wordNumber = index + 1; // The word.number should match the line number in the file
+            
+            // Find the vocab item with the matching word.number
+            const vocabItem = activeVocabList.vocabArray.find(item => item.number === wordNumber);
+            
+            if (vocabItem) {
+                // Overwrite the current image field
+                vocabItem.image = imageFileName;
+            }
+        });
+
+        // Save the updated vocabLists to localStorage
+        saveToLocalStorage();
+
+        // Confirm to the user
+        alert('Image data successfully updated with the .pics file data.');
+    };
+    
+    reader.readAsText(file); // Read the .pics file as text
+}
+
+
+
+
+
+
+
+
+
+// Function to handle simple editing using prompts
+function openEditPrompt(item, index, fileName) {
+    // Ask the user to enter new values for l1, l2, and l3
+    const newL1 = prompt("Edit Language 1 (l1):", item.l1);
+    const newL2 = prompt("Edit Language 2 (l2):", item.l2);
+    const newL3 = prompt("Edit Language 3 (l3):", item.l3);
+
+    // If the user clicks "Cancel", the original value will be kept
+    if (newL1 !== null) item.l1 = newL1;
+    if (newL2 !== null) item.l2 = newL2;
+    if (newL3 !== null) item.l3 = newL3;
+
+    // Save changes to localStorage
+    saveToLocalStorage();
+
+    // Refresh the vocabulary display
+    displayVocabulary(vocabLists.find(list => list.fileName === fileName).vocabArray, fileName);
+
+    // Optionally, show a message that the changes were saved
+    alert("Changes saved successfully.");
+}
+
+
+
+
+
+
+
+
+
+// ************************************* Test ***************
+// ###############################################
+//#########################################
+
+
+function clearScreenForTest() {
+    // Hide the header
+    const header = document.querySelector('.header-container');
+    if (header) {
+        header.classList.add('hidden-header'); // Add class to hide header
+    }
+
+    // Store the current HTML content of the vocab table and other UI elements
+    const vocabTable = document.querySelector('.vocab-table');
+    if (vocabTable) {
+        previousContent = vocabTable.innerHTML; // Store vocab table content
+    }
+
+    // Hide or remove the vocabulary table
+    vocabTable.style.display = 'none';
+
+    // Optionally, hide other elements if necessary
+}
+
+
+
+
+function startTestSession(selectedWords) {
+    // console.log("Selected words:", selectedWords); // Check if the array is empty
+ rScore=0;
+ wScore=0;
+ updateVocabInfoTable();
+    if (selectedWords.length === 0) {
+        // No words due for review
+						                isQuestionPhase = false; // Now we're in the answer phase
+
+        alert("All words have been reviewed. No words are due right now.");
+        return; // Exit the function, preventing the test from starting
+    }
+	
+	
+    // Reset the "round" for all words in the selectedWords array
+    selectedWords.forEach(word => {
+        word.round = 0; // Set the round to 0 for each word
+    });
+	
+    // Clear the screen and prepare for the test
+    clearScreenForTest();
+
+    // Dynamically set the layout for the test phase
+    document.getElementById('central-space').style.height = '100vh'; // Full height for the test
+    document.getElementById('image-display').style.display = 'flex'; // Show the image section
+    document.getElementById('image-display').style.flex = '0 0 50%'; // 50% width for the image section
+    document.getElementById('test-display').style.display = 'flex'; // Show the test section
+    document.getElementById('test-display').style.flex = '0 0 40%'; // 30% width for the test section
+
+    // Hide the "Test" button
+    const testButton = document.getElementById('test-btn');
+    if (testButton) {
+        testButton.style.display = 'none'; // Hide the Test button
+    } else {
+        console.error("Test button not found in the DOM");
+    }
+
+    // Activate the "Show" and "Exit" buttons
+    console.log('Activating Show and Exit buttons');
+    document.getElementById('show-btn').classList.remove('hidden');
+    document.getElementById('exit-btn').classList.remove('hidden');
+
+    // Check if buttons exist
+    const showBtn = document.getElementById('show-btn');
+    const exitBtn = document.getElementById('exit-btn');
+    if (!showBtn) console.error("Show button not found");
+    if (!exitBtn) console.error("Exit button not found");
+
+    // Display the first word from column 1 (l1) in the test
+    let currentWordIndex = 0; // Track the current word index
+    console.log('Displaying first word:', selectedWords[currentWordIndex].l1);
+    displayWordForTest(selectedWords[currentWordIndex]);
+
+    // Store the selected words and current word index globally
+    window.selectedWords = selectedWords;
+    window.currentWordIndex = currentWordIndex;
+}
+
+
+
+// Function to display word (column l2) during test
+// Assume answerPx and questionPx are defined globally
+
+
+
+
+
+// Function to handle OK button click
+// Function to handle OK button click
+function handleOkButtonClick() {
+    const currentWord = window.selectedWords[window.currentWordIndex];
+
+    if (currentWord.round === 0) {
+	rScore+= 1;
+    updateVocabInfoTable();
+        // Increment correct answer count (r)
+        currentWord.r += 1;
+    
+        // Calculate total (t) as correct minus wrong (r - w)
+        currentWord.t = currentWord.r - currentWord.w;
+    
+        // Set lastView (lV) to the current date and time in Day-Time format
+        const now = new Date();
+        currentWord.lV = now.toISOString().slice(0, 19).replace('T', ' '); // Format: YYYY-MM-DD HH:MM:SS
+    
+        // Set round to 0
+        currentWord.round = 0;
+    
+        // Increment level
+        currentWord.level += 1;
+    
+        // Calculate nextPresentation (nP) and PrTS
+        const daysToAdd = Math.pow(2, currentWord.level); // 2^level days
+        const nextPresentationDate = new Date();
+        nextPresentationDate.setDate(nextPresentationDate.getDate() + daysToAdd);
+    
+        // Set the time to 4:00 AM on the next due day
+        nextPresentationDate.setHours(6, 0, 0, 0); // Set the time to 4:00 AM
+    
+        // Save the next presentation date (nP) and timestamp (PrTS)
+        currentWord.nP = nextPresentationDate.toISOString().slice(0, 10); // Format: YYYY-MM-DD
+        currentWord.PrTS = nextPresentationDate.getTime(); // Store the timestamp
+
+        // Set inEx to false (0), meaning it's no longer in the active test pool
+        currentWord.inEx = 0;
+
+    } else {
+        // If round is greater than 0
+        if (currentWord.round < maxRounds) {
+            // Increment the round
+            currentWord.round += 1;
+
+            // Add the word back to the end of the array for another attempt
+            window.selectedWords.push(currentWord);
+        }
+    }
+
+    // Save changes to localStorage
+    saveToLocalStorage();
+
+    // After updating, proceed to show the next question
+    showNextQuestion();
+}
+
+
+
+
+
+function handleShowAgainButtonClick() {
+    const currentWord = window.selectedWords[window.currentWordIndex];
+	wScore+= 1;
+	updateVocabInfoTable();
+
+    // If it's the first round (round === 0)
+    if (currentWord.round === 0) {
+        // Increment wrong answer count (w)
+        currentWord.w += 1;
+
+        // Calculate total (t) as correct minus wrong (r - w)
+        currentWord.t = currentWord.r - currentWord.w;
+
+        // Set lastView (lV) to the current date and time in Day-Time format
+        const now = new Date();
+        currentWord.lV = now.toISOString().slice(0, 19).replace('T', ' '); // Format: YYYY-MM-DD HH:MM:SS
+
+        // Set level to 0 (since the word was answered wrong)
+        currentWord.level = 0;
+
+        // Calculate nextPresentation (nP) and PrTS (set to 1 day in the future)
+        const daysToAdd = 1;
+        const nextPresentationDate = new Date();
+        nextPresentationDate.setDate(nextPresentationDate.getDate() + daysToAdd);
+
+        // Set the time to 4:00 AM on the next due day
+        nextPresentationDate.setHours(9, 0, 0, 0); // Set the time to 4:00 AM
+
+        // Save the next presentation date (nP) and timestamp (PrTS)
+        currentWord.nP = nextPresentationDate.toISOString().slice(0, 10); // Format: YYYY-MM-DD
+        currentWord.PrTS = nextPresentationDate.getTime(); // Store the timestamp
+        
+        // Increment round (to track future attempts)
+        currentWord.round += 1;
+    }
+
+    // Reinsert the word back into the test pool if round < maxRounds
+    if (currentWord.round <= maxRounds) {
+        // Add the word back to the end of the array for another attempt
+        window.selectedWords.push(currentWord);
+    }
+    
+    // Save changes to localStorage
+    saveToLocalStorage();
+
+    // Show the next question
+    showNextQuestion();
+}
+
+
+function shuffle(array) {
+// alert("in shuffle");
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1)); // Random index from 0 to i
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+}
+
+
+
+// Function to show the next question (move to the next word)
+function showNextQuestion() {
+    isQuestionPhase = true; // We're now in the question phase
+
+    const header = document.querySelector('.header-container');
+    if (header) {
+        header.style.display = 'none'; // Hide the header
+    }
+	
+	window.currentWordIndex++; // Move to the next word
+// alert(`Current Word Index: ${window.currentWordIndex}, Last Word: ${lastWord}`);
+//	    if (window.currentWordIndex < 3) {
+/*
+	    if (lastWord > 3) {
+//		alert("kleiner");
+			shuffle(selectedWords);
+			lastWord=0;
+
+			} else {
+			lastWord++;
+		}
+*/	
+    if (window.currentWordIndex < window.selectedWords.length) {
+        // Display the next word
+        displayWordForTest(window.selectedWords[window.currentWordIndex]);
+
+        // Hide the OK and Show Again buttons
+        document.getElementById('ok-btn').classList.add('hidden');
+        document.getElementById('show-again-btn').classList.add('hidden');
+
+        // Reactivate the Show button
+        document.getElementById('show-btn').classList.remove('hidden');
+    } else {
+        // If all words have been tested (including words with "Show Again"), end the test
+		showTestCompletedis();
+    }
+}
+
+
+
+function showTestCompletedis() {
+    // Show a custom alert when the test is completed
+    showCustomAlertEnd(`Test completed!`);
+
+    // Immediately restore the previous screen after showing the custom alert
+    setTimeout(() => {
+        resetTest(); // Restore the previous screen
+    }, 2000); // You can adjust the time (3000ms = 3 seconds) as needed
+}
+
+
+
+
+function showCustomAlertEnd(message) {
+    const alertDiv = document.createElement('div');
+alertDiv.textContent = message;
+alertDiv.style.position = 'fixed';
+alertDiv.style.top = '50%';
+alertDiv.style.left = '50%';
+alertDiv.style.transform = 'translate(-50%, -50%)';
+alertDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+alertDiv.style.padding = '20px';
+alertDiv.style.border = '1px solid #000';
+alertDiv.style.zIndex = '9999';
+alertDiv.style.borderRadius = '10px'; // Add this line to round the border
+
+
+    document.body.appendChild(alertDiv);
+
+    // Remove the alert after 3 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 1000); // Automatically remove after 3 seconds
+}
+
+
+
+
+document.getElementById('exit-btn').addEventListener('click', function () {
+    restorePreviousScreen(); // Call function to restore the original screen
+});
+
+function restorePreviousScreen(currentSortMethod) {
+// alert ("asdf");
+    // Hide test buttons
+    document.getElementById('show-btn').classList.add('hidden');
+    document.getElementById('exit-btn').classList.add('hidden');
+    document.getElementById('ok-btn').classList.add('hidden');
+    document.getElementById('show-again-btn').classList.add('hidden');
+
+    // Remove word display
+    const wordDisplay = document.getElementById('word-display');
+    if (wordDisplay) {
+        wordDisplay.remove();
+    }
+
+    // Make sure any changes to vocabArray are properly saved into local storage
+    saveToLocalStorage(); // Make sure to save the updated vocab array
+
+    // Re-render the vocabulary table with the updated vocabArray
+    const activeVocabListName = document.getElementById('vocabListTitle').textContent;
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListName || list.fileName === activeVocabListName);
+    
+    if (activeVocabList) {
+        displayVocabulary(activeVocabList.vocabArray, activeVocabList.fileName, currentSortMethod); // Re-render the updated vocab list
+    }
+
+    // Show the "Test" button again
+    const testButton = document.getElementById('test-btn');
+    if (testButton) {
+        testButton.style.display = 'block'; // Make the Test button visible again
+    } else {
+        console.error("Test button not found in the DOM");
+    }
+}
+
+
+
+
+
+
+
+
+
+
+document.getElementById('show-btn').addEventListener('click', function () {
+    const currentWord = window.selectedWords[window.currentWordIndex];
+
+    // Show the full word (l1, l2, and l3 if available)
+    const wordDisplay = document.getElementById('word-display');
+    wordDisplay.textContent = `${currentWord.l1} - ${currentWord.l2} ${currentWord.l3 ? '- ' + currentWord.l3 : ''}`;
+
+    // Hide the "Show" button and display "OK" and "Show Again" buttons
+    document.getElementById('show-btn').classList.add('hidden');
+    document.getElementById('ok-btn').classList.remove('hidden');
+    document.getElementById('show-again-btn').classList.remove('hidden');
+});
+
+
+
+
+function resetTest() {
+    isQuestionPhase = false; // Now we're in the answer phase
+	// simulateClickOnToggleButton();
+
+    // Reset the layout back to its minimal state
+    document.getElementById('central-space').style.height = '1px'; // Minimize the height after the test
+    document.getElementById('image-display').style.display = 'none'; // Hide the image section
+    document.getElementById('test-display').style.display = 'none'; // Hide the test section
+	
+	
+    // Restore the header when resetting the test
+    const header = document.querySelector('.header-container');
+    if (header) {
+        header.style.display = 'block'; // Show the header again
+    }
+
+    // Hide all test buttons
+    document.getElementById('show-btn').classList.add('hidden');
+    document.getElementById('exit-btn').classList.add('hidden');
+    document.getElementById('ok-btn').classList.add('hidden');
+    document.getElementById('show-again-btn').classList.add('hidden');
+
+    // Remove the word display from the screen
+    const wordDisplay = document.getElementById('word-display');
+    if (wordDisplay) {
+        wordDisplay.remove();
+    }
+
+/*
+    // Restore the header
+    const header = document.querySelector('.header-container');
+    if (header) {
+        header.classList.remove('hidden-header'); // Remove class to show header
+    }
+*/
+    // Restore the vocabulary list by calling displayVocabulary again
+    const vocabTable = document.querySelector('.vocab-table');
+    const activeVocabListTitle = document.getElementById('vocabListTitle').textContent;
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListTitle || list.fileName === activeVocabListTitle);
+
+    if (vocabTable && activeVocabList) {
+        displayVocabulary(activeVocabList.vocabArray, activeVocabList.fileName);
+        vocabTable.style.display = 'block'; // Make the vocab table visible again
+    }
+
+    // Ensure the Test button is shown again
+    const testButton = document.getElementById('test-btn');
+    if (testButton) {
+        testButton.style.display = 'block'; // Make the Test button visible again
+    } else {
+        console.error("Test button not found in the DOM");
+    }
+}
+
+
+
+
+
+
+function selectWordsForTest() {
+    isQuestionPhase = true; // We're now in the question phase
+
+    // Hide the header when starting the test
+    const header = document.querySelector('.header-container');
+    if (header) {
+        header.style.display = 'none'; // Hide the header
+    }
+
+    const currentTimestamp = Date.now(); // Get the current timestamp
+    const maxWordsFunction = maxWords; // Maximum words to consider
+    // const wordsInTest = 3; // Number of words to select for the test
+
+    // Get the currently displayed vocabulary list
+    const activeVocabListName = document.getElementById('vocabListTitle').textContent;
+
+    // Find the active list in vocabLists
+    const activeVocabList = vocabLists.find(list => list.trueName === activeVocabListName || list.fileName === activeVocabListName);
+
+    if (!activeVocabList) {
+        alert('No active vocabulary list found for testing.');
+        return;
+    }
+
+    // Step 1: Set 'inEx' flags to 0 for all words in the active list
+    activeVocabList.vocabArray.forEach(word => {
+        word.inEx = 0; // Reset the inEx flag for all words
+    });
+
+    // Step 2: Filter words where PrTS is either null or less than the current timestamp,
+    // and limit to words with number <= maxWordsFunction
+    let eligibleWords = activeVocabList.vocabArray.filter(word => 
+        (!word.PrTS || word.PrTS < currentTimestamp) && word.number <= maxWordsFunction
+    );
+
+    // Step 3: Randomly select up to wordsInTest words (or fewer if there aren't enough eligible words)
+    const selectedWords = [];
+    while (selectedWords.length < wordsInTest && eligibleWords.length > 0) {
+        const randomIndex = Math.floor(Math.random() * eligibleWords.length); // Pick a random word
+        selectedWords.push(eligibleWords[randomIndex]); // Add to the selected words
+        eligibleWords.splice(randomIndex, 1); // Remove the selected word from the pool
+    }
+
+    // Step 4: Set inEx = 1 for the selected words
+    selectedWords.forEach(word => {
+        word.inEx = 1;
+    });
+
+    // Step 5: Display the selected words in a provisional window
+    console.log('Selected words:', selectedWords);
+
+    startTestSession(selectedWords);
+}
+
+
+
+
+
+/*
+********************* Alte Version ***********************
+
+*/
+
+
+// Function to display the word (l1) for the test
+function displayWordForTest(word) {
+    isQuestionPhase = true; // Set the flag to indicate we're in the question phase
+	let drv = String.fromCharCode(drive.charCodeAt(0) + 5);
+
+    // Get or create the word-display element
+    let wordDisplay = document.getElementById('word-display');
+
+    // If the element doesn't exist, create it and add it to the DOM
+    if (!wordDisplay) {
+        wordDisplay = document.createElement('div');
+        wordDisplay.id = 'word-display';
+        document.getElementById('test-display').appendChild(wordDisplay);
+    }
+
+    // Set the text content to display the question
+    // wordDisplay.textContent = word.l1;
+	wordDisplay.textContent = isSwitched ? word.l2 : word.l1;
+
+
+    // Apply initial styles
+    wordDisplay.style.fontSize = `${questionPx}px`;  // Set the font size dynamically
+    wordDisplay.style.fontWeight = 'normal';         // Set font weight
+    wordDisplay.style.textAlign = 'center';          // Center the text horizontally
+    wordDisplay.style.width = '100%';                // Ensure the text spans the full width of its container
+
+    // Left half - display the image
+    const imageDisplay = document.getElementById('image-display');
+    const image = document.createElement('img');
+
+    // Fetch the image file name from the 'image' field in the word object
+    const imageFileName = word.image; // Get the image from the word object
+
+const activeVocabListName = document.getElementById('vocabListTitle').textContent; 
+const vocabList = vocabLists.find(list => list.trueName === activeVocabListName || list.fileName === activeVocabListName);
+if (vocabList.trueName.startsWith("DW_")) {
+    image.src = `file:///${drv}:/%20WS/${imageFileName}`; 
+
+} else {
+    image.src = `wspics/${imageFileName}`;
+}	
+	
+/*
+	image.src = `wspics/${imageFileName}`;
+	image.src = `q:/%20WS/${imageFileName}`;#
+*/
+
+  //  image.src = `wspics/${imageFileName}`; // Set the image path using the image field from the word object
+    image.alt = `Image for word ${word.number}`; // Alt text for accessibility
+
+    // Clear any previous image and insert the new one
+    imageDisplay.innerHTML = ''; // Clear previous image
+    imageDisplay.appendChild(image);
+	
+
+
+if (isInputMode) {
+    // Check if the input field already exists and remove it if so
+    const existingInputField = document.getElementById('answer-input');
+    if (existingInputField) {
+        wordDisplay.removeChild(existingInputField); // Remove the existing input field
+    }
+
+    // Create a new input field for user input
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.id = 'answer-input';
+    inputField.placeholder = 'Type your answer here...';
+    inputField.style.fontSize = '18px';  // Set input field font size
+    inputField.style.marginTop = '20px';
+    inputField.style.display = 'block';  // Ensure it displays as a block element
+    inputField.style.width = '100%';     // Full width input
+    inputField.value = ''; // Ensure the input field is empty
+
+    // Add the input field to the word display
+    wordDisplay.appendChild(inputField);
+
+    // Automatically focus on the input field to place the cursor
+    setTimeout(() => {
+        inputField.focus();
+    }, 10);  // Delay to allow rendering first
+
+    // Event listener to handle all key events when typing in the input field
+    inputField.addEventListener('keydown', function(event) {
+        event.stopPropagation(); // Stop all key events from propagating
+
+        // Check for Enter key submission
+        if (event.key === 'Enter') {
+			giro=0;
+            handleUserInput(word, inputField.value.trim());
+        }
+    });
+} else {
+    // Remove the submit button if needed (optional)
+    const existingButton = wordDisplay.querySelector('button');
+    if (existingButton) {
+        wordDisplay.removeChild(existingButton); // Remove the existing submit button
+    }
+}
+
+
+
+	
+	
+}
+
+
+
+
+function handleUserInput(word, userInput) {
+
+    const currentWord = window.selectedWords[window.currentWordIndex];
+
+    if (userInput.toLowerCase() === 'x') {
+        // Handle exiting the test mode and reset
+        selectedWords = 0; // Reset selected words
+        isQuestionPhase = false; // Now we're in the answer phase
+        resetTest(); // Call the function to exit test mode
+		simulateClickOnToggleButton();
+
+        return; // Exit the function
+    }
+	
+    // Normalize user input for comparison
+    const expectedAnswer = isSwitched ? word.l1 : word.l2; // Depending on the language direction
+    const isCorrect = userInput.toLowerCase() === expectedAnswer.toLowerCase(); // Check for case-insensitive match
+
+    // Update word variables based on correctness
+    if (isCorrect) {
+        // Increment correct answer count (r)
+    if (currentWord.round === 0) {
+//	alert(giro);
+        word.r += 1;
+		rScore+= 1;
+updateVocabInfoTable();
+
+        // Calculate total (t) as correct minus wrong (r - w)
+        word.t = word.r - word.w;
+
+        // Set lastView (lV) to the current date and time in Day-Time format
+        const now = new Date();
+        word.lV = now.toISOString().slice(0, 19).replace('T', ' '); // Format: YYYY-MM-DD HH:MM:SS
+
+        // Set round to 0
+        // word.round = 0;
+
+        // Increment level
+        word.level += 1;
+
+        // Calculate nextPresentation (nP) and PrTS
+        const daysToAdd = Math.pow(2, word.level); // 2^level days
+        const nextPresentationDate = new Date();
+        nextPresentationDate.setDate(nextPresentationDate.getDate() + daysToAdd);
+
+        // Set the time to 4:00 AM on the next due day
+        nextPresentationDate.setHours(9, 0, 0, 0); // Set the time to 4:00 AM
+
+        // Save the next presentation date (nP) and timestamp (PrTS)
+        word.nP = nextPresentationDate.toISOString().slice(0, 10); // Format: YYYY-MM-DD
+        word.PrTS = nextPresentationDate.getTime(); // Store the timestamp
+
+        // Set inEx to false (0), meaning it's no longer in the active test pool
+        word.inEx = 0;
+    } else {
+currentWord.round += 1;
+	}
+        saveToLocalStorage();
+        showNextQuestion();
+    } else {
+        // Increment wrong answer count (w)
+    if (currentWord.round === 0) {
+		
+        word.w += 1;
+		wScore += 1;
+updateVocabInfoTable();
+
+        // Calculate total (t) as correct minus wrong (r - w)
+        word.t = word.r - word.w;
+
+        // Set lastView (lV) to the current date and time in Day-Time format
+        const now = new Date();
+        word.lV = now.toISOString().slice(0, 19).replace('T', ' '); // Format: YYYY-MM-DD HH:MM:SS
+
+        // Set level to 0 (since the word was answered wrong)
+        word.level = 0;
+
+        // Calculate nextPresentation (nP) and PrTS (set to 1 day in the future)
+        const daysToAdd = 1;
+        const nextPresentationDate = new Date();
+        nextPresentationDate.setDate(nextPresentationDate.getDate() + daysToAdd);
+
+        // Set the time to 4:00 AM on the next due day
+        nextPresentationDate.setHours(9, 0, 0, 0); // Set the time to 4:00 AM
+
+        // Save the next presentation date (nP) and timestamp (PrTS)
+        word.nP = nextPresentationDate.toISOString().slice(0, 10); // Format: YYYY-MM-DD
+        word.PrTS = nextPresentationDate.getTime(); // Store the timestamp
+        
+        // Increment round (to track future attempts)
+        // word.round += 1;
+    } else {
+currentWord.round += 1;
+	}
+        // Save changes to localStorage
+        saveToLocalStorage();
+        // Optionally provide feedback to the user
+        playBeep(); // Optional sound feedback for incorrect answer
+        
+        // Call the second function to handle user input loop until correct answer
+        awaitUserInput(word);
+        
+
+    }
+}
+
+
+
+function handleUserInput2(word, userInput) {
+    if (userInput.toLowerCase() === 'x') {
+        // Handle exiting the test mode and reset
+        selectedWords = 0; // Reset selected words
+		isQuestionPhase = false; // Now we're in the answer phase
+        resetTest(); // Call the function to exit test mode
+        return; // Exit the function
+    }
+    // Normalize user input for comparison
+    const expectedAnswer = isSwitched ? word.l1 : word.l2; // Depending on the language direction
+    const isCorrect = userInput.toLowerCase() === expectedAnswer.toLowerCase(); // Check for case-insensitive match
+
+    // Update word variables based on correctness
+    saveToLocalStorage();
+/*
+    if (isCorrect) {
+        showNextQuestion();
+    } else {
+        playBeep(); 
+        awaitUserInput(word);
+    }
+
+
+
+*/
+	if (isCorrect) {
+		word.round +=1;
+		if (word.round <3) {
+				window.selectedWords.push(word);		
+				showNextQuestion();
+		} else {
+			awaitUserInput(word);
+		}
+	} 
+	
+
+}
+
+function awaitUserInput(word) {
+    // Create a new input field for user attempts
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.placeholder = 'Your answer...';
+    inputField.style.fontSize = '18px';
+    inputField.style.marginTop = '20px';
+    inputField.style.display = 'block';  // Ensure it displays as a block element
+    inputField.style.width = '100%';     // Full width input
+
+    // Get the word display element
+    const wordDisplay = document.getElementById('word-display');
+    wordDisplay.appendChild(inputField); // Add the input field to the word display
+
+    // Display the correct answer below the input field
+    const answerDisplay = document.createElement('div');
+    answerDisplay.textContent = `${isSwitched ? word.l1 : word.l2}`;
+    answerDisplay.style.fontSize = '28px';
+    answerDisplay.style.marginTop = '10px';
+    answerDisplay.style.color = 'black'; // Optional: Color for the correct answer
+    wordDisplay.appendChild(answerDisplay); // Add the answer display
+
+    // Automatically focus on the input field to place the cursor
+    setTimeout(() => {
+        inputField.focus();
+    }, 10);  // Delay to allow rendering first
+
+    // Event listener to stop all shortcut key events while typing in the input field
+    inputField.addEventListener('keydown', function(event) {
+        event.stopPropagation(); // Stop all key events from propagating
+    });
+
+    // Event listener for the input field to check for answers
+    inputField.addEventListener('keydown', function(event) {
+        // Check for the Enter key
+        if (event.key === 'Enter') {
+            const userInput = inputField.value.trim();
+            // Call handleUserInput to check the answer
+            handleUserInput2(word, userInput);
+        }
+    });
+
+    // Optionally, provide an event listener for when the user clicks outside the input field to cancel
+    inputField.addEventListener('blur', function() {
+        // If the user clicks outside, we can remove the input field
+        wordDisplay.removeChild(inputField); // Remove the input field
+        wordDisplay.removeChild(answerDisplay); // Remove the answer display
+    });
+}
+
+
+
+
+
+		
+		
+function handleShowButtonClick() {
+	isQuestionPhase = false; // We've shown the answer, now in the answer phase
+
+    console.log('Show button clicked'); // Debugging to ensure the button works
+
+    const currentWord = window.selectedWords[window.currentWordIndex];
+
+    // Show the second (l2) and third (l3) words if available
+    displayAnswer(currentWord);
+
+    // Hide the "Show" button and display OK and Show Again buttons
+    document.getElementById('show-btn').classList.add('hidden');
+    document.getElementById('ok-btn').classList.remove('hidden');
+    document.getElementById('show-again-btn').classList.remove('hidden');
+}
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+
+    // Array of available JPG file names
+/*	
+    const imageList = [
+        'WS101.jpg', 'WS102.jpg', 'WS103.jpg', 'WS104.jpg', 'WS105.jpg',
+        'WS106.jpg', 'WS107.jpg', 'WS108.jpg', 'WS109.jpg', 'WS110.jpg',
+        'WS111.jpg', 'WS141.jpg', 'WS142.jpg', 'WS143.jpg', 'WS144.jpg',
+        'WS145.jpg', 'WS146.jpg', 'WS147.jpg', 'WS148.jpg', 'WS149.jpg',
+        'WS150.jpg', 'WS151.jpg', 'WS152.jpg', 'WS153.jpg', 'WS154.jpg'
+    ];
+*/	
+    // Array of available JPG file names
+    const imageList = [
+        'WS101.jpg'
+    ];	
+
+    // Randomly select an image
+    const randomIndex = Math.floor(Math.random() * imageList.length);
+    const randomImage = imageList[randomIndex];
+
+    // Set the selected image as the source of the banner
+    const bannerImage = document.getElementById('random-banner');
+    bannerImage.src = `WordSirenPics/${randomImage}`;
+});
+
+
+function showTestCompletedModal() {
+	isQuestionPhase = false; 
+    const modal = document.getElementById('test-complete-modal');
+    modal.style.display = 'block'; // Show the modal
+    modal.classList.add('show'); // Add the "show" class to make it fade in
+
+    // Close the modal when the 'x' button is clicked
+    document.querySelector('.close').onclick = function() {
+        closeModal();
+    };
+
+    // Close the modal when the "Close" button is clicked
+    document.getElementById('close-modal-btn').onclick = function() {
+        closeModal();
+    };
+
+    // Close the modal when the ESC key is pressed
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "Escape") {
+            closeModal();
+        }
+    });
+
+    // Function to hide the modal and reset the test
+    function closeModal() {
+        modal.classList.remove('show'); // Remove the "show" class for fade out
+        setTimeout(function() {
+            modal.style.display = 'none'; // Hide the modal after the fade-out effect
+            resetTest(); // Call the resetTest function after closing the modal
+        }, 300); // Delay matches the CSS transition duration
+    }
+}
+
+
+
+
+
+
+// Function to display the language selection menu with a scrollable list
+function showLanguageSelectionMenu() {
+    const voices = speechSynthesis.getVoices();
+
+    // Create the modal if not already present
+    if (document.getElementById('languageSelectionModal')) {
+        return; // Prevent multiple modals
+    }
+
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.id = 'languageSelectionModal';
+
+    // Create title for modal
+    const title = document.createElement('h3');
+    title.textContent = 'Select a Language';
+    modal.appendChild(title);
+
+    // Create buttons for each available voice (language)
+    availableLanguages.forEach((lang, index) => {
+        const button = document.createElement('button');
+        button.textContent = `${lang.label} (${lang.code})`;
+        if (lang.code === currentLanguage) {
+            button.classList.add('active'); // Highlight the current language
+        }
+
+        // On click, set the current language and close the modal
+        button.addEventListener('click', function () {
+            currentLanguage = lang.code;
+			updateVocabInfoTable();
+
+            showCustomAlert(`Language set to: ${lang.label}`);
+            closeModal(); // Close the modal after selection
+
+        });
+
+        modal.appendChild(button);
+    });
+
+    // Append modal to body
+    document.body.appendChild(modal);
+
+    // Function to close modal
+    function closeModal() {
+        document.body.removeChild(modal); // Remove the modal
+        document.removeEventListener('keydown', escKeyListener); // Remove ESC listener
+        window.removeEventListener('click', outsideClickListener); // Remove click listener
+    }
+
+    // Close modal on ESC key press
+    function escKeyListener(event) {
+        if (event.key === 'Escape') {
+            closeModal(); // Call the close function
+        }
+    }
+    document.addEventListener('keydown', escKeyListener);
+
+    // Close modal on outside click
+    function outsideClickListener(event) {
+        if (!modal.contains(event.target)) {
+            closeModal(); // Call the close function
+        }
+    }
+    window.addEventListener('click', outsideClickListener);
+}
+
+
+
+
+function showCenteredAlert(message) {
+    // Create the alert div and apply the CSS class
+    const alertDiv = document.createElement('div');
+    alertDiv.textContent = message;
+    alertDiv.classList.add('small-alert'); // Apply the CSS for styling
+
+    // Add the alert to the body
+    document.body.appendChild(alertDiv);
+
+    // Make it visible after appending (to trigger the CSS transition)
+    setTimeout(() => {
+        alertDiv.style.opacity = '1';
+    }, 10); // Small delay to allow transition to kick in
+
+    // Remove the alert after 1 second (including fade-out)
+    setTimeout(() => {
+        alertDiv.style.opacity = '0'; // Fade-out
+        setTimeout(() => {
+            document.body.removeChild(alertDiv); // Remove the element
+        }, 300); // Delay matches the fade-out duration
+    }, 1000); // Visible for 1 second
+}
+
+
+// Function to toggle between L1 and L2
+function toggleLanguageSwitch() {
+    isSwitched = !isSwitched; // Toggle the state
+    updateVocabInfoTable(); // Call this to update the table
+
+    // Play the beep sound
+    playBeep();
+
+    // Create the alert div and apply the CSS class
+    const alertDiv = document.createElement('div');
+    alertDiv.textContent = isSwitched ? "Switched to L2" : "Switched to L1"; // Update alert message
+    alertDiv.classList.add('small-alert'); // Apply CSS
+
+    // Add the alert to the body
+    document.body.appendChild(alertDiv);
+
+    // Make it visible after appending (to trigger the CSS transition)
+    setTimeout(() => {
+        alertDiv.style.opacity = '1';
+    }, 10); // Small delay to allow transition to kick in
+
+    // Remove the alert after 1 second (including fade-out)
+    setTimeout(() => {
+        alertDiv.style.opacity = '0'; // Fade-out
+        setTimeout(() => {
+            document.body.removeChild(alertDiv); // Remove the element
+        }, 300); // Delay matches the fade-out duration
+    }, 1000); // Visible for 1 second
+}
+
+
+
+
+
+
+
+// Function to toggle between the current mode and input answer mode
+function toggleTestMode() {
+    isInputMode = !isInputMode; // Toggle the mode
+
+    // Play a beep sound for feedback
+    playBeep();
+
+    // Show a small alert to indicate the current mode
+    const alertDiv = document.createElement('div');
+    alertDiv.textContent = isInputMode ? "Input Mode" : "Self-Evaluation Mode";
+    alertDiv.classList.add('small-alert'); // Apply CSS for the alert
+
+    document.body.appendChild(alertDiv);
+
+    // Make the alert visible for 1 second, then remove it
+    setTimeout(() => {
+        alertDiv.style.opacity = '1';
+    }, 10);
+
+    setTimeout(() => {
+        alertDiv.style.opacity = '0'; 
+        setTimeout(() => {
+            document.body.removeChild(alertDiv);
+        }, 300); 
+    }, 1000); 
+
+    // Update the inputModus cell text content
+    document.getElementById('inputModus').textContent = isInputMode ? "Type answer" : "Self-Eval"; // Update the display
+}
+
+/*
+// Add click event listener to the inputModus cell
+document.getElementById('inputModus').addEventListener('click', toggleTestMode);
+*/
+
+
+
+
+
+
+// postponement
+
+const oneDayInMs = 86400000; // 24 hours in milliseconds
+/*
+// Function to open the postpone modal when the "@" key is pressed
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'q') {
+    const postponeModal = document.getElementById('postponeModal');
+    const instance = M.Modal.getInstance(postponeModal);
+    instance.open();
+  }
+});
+*/
+
+
+
+
+// Function to display the word and answers (l1, l2, l3)
+function displayAnswer(currentWord) {
+    const wordDisplay = document.getElementById('word-display');
+
+    // Build the HTML content with question and answer font sizes
+let content = `
+    <div style="font-size: ${questionPx}px;">${isSwitched ? currentWord.l2 : currentWord.l1}</div>
+    <div style="margin-bottom: 20px; font-size: ${answerPx}px;">${isSwitched ? currentWord.l1 : currentWord.l2}</div>
+    <div style="font-size: ${answerPx}px;">${currentWord.l3 || ''}</div>
+`;
+
+    wordDisplay.innerHTML = content; // Update the word display with l1, l2, and l3
+
+    // Play the pronunciation of l1 after displaying the answer
+    speakChinese(currentWord.l1);
+}
+
+
+
+
+
+// Function to display selected words in a provisional window
+function displaySelectedWords(selectedWords) {
+    let wordListHtml = "<h2>Selected Words for Test</h2><ul>";
+    selectedWords.forEach(word => {
+        wordListHtml += `<li>${word.l1} - ${word.l2} ${word.l3 ? '- ' + word.l3 : ''}</li>`;
+    });
+    wordListHtml += "</ul>";
+
+    // Create a provisional modal or alert to display the words
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.backgroundColor = '#fff';
+    modal.style.padding = '20px';
+    modal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+    modal.style.zIndex = '1000';
+    modal.innerHTML = wordListHtml;
+
+    const closeButton = document.createElement('button');
+    closeButton.textContent = "Close";
+    closeButton.style.marginTop = '10px';
+    closeButton.addEventListener('click', () => {
+        modal.remove();
+        // Proceed to the actual test after displaying
+        startTestSession();
+    });
+
+    modal.appendChild(closeButton);
+    document.body.appendChild(modal);
+}
+
+
+
+
+
+		
+    </script>
+
+</body>
+</html>
